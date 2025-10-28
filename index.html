@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tiana's Reseñas</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="./style2.css">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-links">
+            <a href="index.html">Inicio</a>
+            <a href="restaurantes.html">Restaurantes</a>
+            <a href="#categorias">Categorías</a>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <h1>Descubre los mejores restaurantes</h1>
+        <p>Explora, califica y disfruta de experiencias culinarias únicas</p>
+        <div class="search-bar">
+            <input type="text" placeholder="Buscar restaurantes, platos, cocinas...">
+            <button><i class="fas fa-search"></i> Buscar</button>
+        </div>
+    </section>
+
+    <section class="filters">
+        <button class="filter-btn active">Todos</button>
+        <button class="filter-btn">Comida Rápida</button>
+        <button class="filter-btn">Gourmet</button>
+        <button class="filter-btn">Vegetariana</button>
+        <button class="filter-btn">Sushi</button>
+    </section>
+
+    <div class="container">
+        <h2 class="section-title">⭐ Restaurantes Destacados</h2>
+        <div class="restaurants-grid">
+            <div class="restaurant-card">
+                <div class="card-image">🍕</div>
+                <div class="card-content">
+                    <div class="card-header">
+                        <h3 class="card-title">La Bella Italia</h3>
+                        <div class="rating">
+                            <i class="fas fa-star"></i> 4.8
+                        </div>
+                    </div>
+                    <p class="card-category">🇮🇹 Italiana</p>
+                    <p class="card-description">Auténtica cocina italiana con recetas tradicionales y los mejores
+                        ingredientes importados.</p>
+                    <div class="card-footer">
+                        <div class="card-info">
+                            <span><i class="fas fa-clock"></i> 30-45 min</span>
+                            <span><i class="fas fa-dollar-sign"></i> $$</span>
+                        </div>
+                        <button class="btn-view">Ver Menú</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="restaurant-card">
+                <div class="card-image">🍣</div>
+                <div class="card-content">
+                    <div class="card-header">
+                        <h3 class="card-title">Sakura Sushi</h3>
+                        <div class="rating">
+                            <i class="fas fa-star"></i> 4.9
+                        </div>
+                    </div>
+                    <p class="card-category">🇯🇵 Japonesa</p>
+                    <p class="card-description">Sushi fresco preparado por maestros sushimen con más de 20 años de
+                        experiencia.</p>
+                    <div class="card-footer">
+                        <div class="card-info">
+                            <span><i class="fas fa-clock"></i> 25-35 min</span>
+                            <span><i class="fas fa-dollar-sign"></i> $$$</span>
+                        </div>
+                        <button class="btn-view">Ver Menú</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="restaurant-card">
+                <div class="card-image">🌮</div>
+                <div class="card-content">
+                    <div class="card-header">
+                        <h3 class="card-title">Tacos El Güero</h3>
+                        <div class="rating">
+                            <i class="fas fa-star"></i> 4.7
+                        </div>
+                    </div>
+                    <p class="card-category">🇲🇽 Mexicana</p>
+                    <p class="card-description">Los mejores tacos de la ciudad con tortillas hechas a mano y salsas
+                        caseras.</p>
+                    <div class="card-footer">
+                        <div class="card-info">
+                            <span><i class="fas fa-clock"></i> 15-25 min</span>
+                            <span><i class="fas fa-dollar-sign"></i> $</span>
+                        </div>
+                        <button class="btn-view">Ver Menú</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="restaurant-card">
+                <div class="card-image">🥗</div>
+                <div class="card-content">
+                    <div class="card-header">
+                        <h3 class="card-title">Green Garden</h3>
+                        <div class="rating">
+                            <i class="fas fa-star"></i> 4.6
+                        </div>
+                    </div>
+                    <p class="card-category">🥬 Vegetariana</p>
+                    <p class="card-description">Opciones saludables y deliciosas 100% vegetarianas con ingredientes
+                        orgánicos.</p>
+                    <div class="card-footer">
+                        <div class="card-info">
+                            <span><i class="fas fa-clock"></i> 20-30 min</span>
+                            <span><i class="fas fa-dollar-sign"></i> $$</span>
+                        </div>
+                        <button class="btn-view">Ver Menú</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="restaurant-card">
+                <div class="card-image">🍔</div>
+                <div class="card-content">
+                    <div class="card-header">
+                        <h3 class="card-title">Burger Master</h3>
+                        <div class="rating">
+                            <i class="fas fa-star"></i> 4.5
+                        </div>
+                    </div>
+                    <p class="card-category">🍟 Comida Rápida</p>
+                    <p class="card-description">Hamburguesas gourmet con carne premium y combinaciones únicas de
+                        sabores.</p>
+                    <div class="card-footer">
+                        <div class="card-info">
+                            <span><i class="fas fa-clock"></i> 15-20 min</span>
+                            <span><i class="fas fa-dollar-sign"></i> $$</span>
+                        </div>
+                        <button class="btn-view">Ver Menú</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="restaurant-card">
+                <div class="card-image">🍰</div>
+                <div class="card-content">
+                    <div class="card-header">
+                        <h3 class="card-title">Sweet Dreams</h3>
+                        <div class="rating">
+                            <i class="fas fa-star"></i> 4.9
+                        </div>
+                    </div>
+                    <p class="card-category">🧁 Postres</p>
+                    <p class="card-description">Pasteles artesanales, cupcakes y postres únicos para endulzar tu día.
+                    </p>
+                    <div class="card-footer">
+                        <div class="card-info">
+                            <span><i class="fas fa-clock"></i> 10-15 min</span>
+                            <span><i class="fas fa-dollar-sign"></i> $$</span>
+                        </div>
+                        <button class="btn-view">Ver Menú</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <aside class="sidebar">
+            <h3>🔍 Filtros</h3>
+
+
+            <div class="filter-section">
+                <label>Ranking</label>
+                <select>
+                    <option>Todas</option>
+                    <option>⭐ 4.5+</option>
+                    <option>⭐ 4.0+</option>
+                    <option>⭐ 3.5+</option>
+                    <option>⭐ 3.0+</option>
+                </select>
+            </div>
+        </aside>
+
+        <main class="content">
+            <div class="content-header">
+                <h1>Todos los Restaurantes</h1>
+                <select class="sort-select">
+                    <option>Ordenar por</option>
+                    <option>Popularidad</option>
+                    <option>Ranking</option>
+                </select>
+            </div>
+
+            <div class="restaurants-list">
+                <div class="restaurant-item">
+                    <div class="item-image">🍕</div>
+                    <div class="item-content">
+                        <div>
+                            <div class="item-header">
+                                <h3 class="item-title">La Bella Italia</h3>
+                                <div class="item-rating">
+                                    <i class="fas fa-star"></i> 4.8
+                                </div>
+                            </div>
+                            <p class="item-category">🇮🇹 Italiana</p>
+                            <p class="item-description">Auténtica cocina italiana con recetas tradicionales transmitidas
+                                por generaciones. Ingredientes importados directamente desde Italia para garantizar el
+                                sabor más auténtico.</p>
+                            <div class="item-tags">
+                                <span class="tag">Pasta</span>
+                                <span class="tag">Pizza</span>
+                                <span class="tag">Vino</span>
+                                <span class="tag">Delivery</span>
+                            </div>
+                        </div>
+                        <div class="item-footer">
+                            <div class="item-info">
+                                <span><i class="fas fa-clock"></i> 30-45 min</span>
+                                <span><i class="fas fa-dollar-sign"></i> $$</span>
+                                <span><i class="fas fa-comment"></i> 234 reseñas</span>
+                            </div>
+                            <button class="btn-view">Ver Detalles</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="restaurant-item">
+                    <div class="item-image">🍣</div>
+                    <div class="item-content">
+                        <div>
+                            <div class="item-header">
+                                <h3 class="item-title">Sakura Sushi</h3>
+                                <div class="item-rating">
+                                    <i class="fas fa-star"></i> 4.9
+                                </div>
+                            </div>
+                            <p class="item-category">🇯🇵 Japonesa</p>
+                            <p class="item-description">Sushi preparado por maestros sushimen con más de 20 años de
+                                experiencia. Pescado fresco todos los días y arroz de la mejor calidad.</p>
+                            <div class="item-tags">
+                                <span class="tag">Sushi</span>
+                                <span class="tag">Sashimi</span>
+                                <span class="tag">Ramen</span>
+                                <span class="tag">Reservas</span>
+                            </div>
+                        </div>
+                        <div class="item-footer">
+                            <div class="item-info">
+                                <span><i class="fas fa-clock"></i> 25-35 min</span>
+                                <span><i class="fas fa-dollar-sign"></i> $$$</span>
+                                <span><i class="fas fa-comment"></i> 189 reseñas</span>
+                            </div>
+                            <button class="btn-view">Ver Detalles</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="restaurant-item">
+                    <div class="item-image">🌮</div>
+                    <div class="item-content">
+                        <div>
+                            <div class="item-header">
+                                <h3 class="item-title">Tacos El Güero</h3>
+                                <div class="item-rating">
+                                    <i class="fas fa-star"></i> 4.7
+                                </div>
+                            </div>
+                            <p class="item-category">🇲🇽 Mexicana</p>
+                            <p class="item-description">Los tacos más auténticos de la ciudad. Tortillas hechas a mano,
+                                carnes marinadas con recetas familiares y salsas caseras que te transportarán a México.
+                            </p>
+                            <div class="item-tags">
+                                <span class="tag">Tacos</span>
+                                <span class="tag">Quesadillas</span>
+                                <span class="tag">Para llevar</span>
+                            </div>
+                        </div>
+                        <div class="item-footer">
+                            <div class="item-info">
+                                <span><i class="fas fa-clock"></i> 15-25 min</span>
+                                <span><i class="fas fa-dollar-sign"></i> $</span>
+                                <span><i class="fas fa-comment"></i> 456 reseñas</span>
+                            </div>
+                            <button class="btn-view">Ver Detalles</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="restaurant-item">
+                    <div class="item-image">🥗</div>
+                    <div class="item-content">
+                        <div>
+                            <div class="item-header">
+                                <h3 class="item-title">Green Garden</h3>
+                                <div class="item-rating">
+                                    <i class="fas fa-star"></i> 4.6
+                                </div>
+                            </div>
+                            <p class="item-category">🥬 Vegetariana</p>
+                            <p class="item-description">Comida vegetariana y vegana deliciosa y nutritiva. Ingredientes
+                                orgánicos de productores locales para garantizar frescura y sabor.</p>
+                            <div class="item-tags">
+                                <span class="tag">Vegano</span>
+                                <span class="tag">Orgánico</span>
+                                <span class="tag">Saludable</span>
+                                <span class="tag">Delivery</span>
+                            </div>
+                        </div>
+                        <div class="item-footer">
+                            <div class="item-info">
+                                <span><i class="fas fa-clock"></i> 20-30 min</span>
+                                <span><i class="fas fa-dollar-sign"></i> $$</span>
+                                <span><i class="fas fa-comment"></i> 167 reseñas</span>
+                            </div>
+                            <button class="btn-view">Ver Detalles</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="restaurant-item">
+                    <div class="item-image">🍔</div>
+                    <div class="item-content">
+                        <div>
+                            <div class="item-header">
+                                <h3 class="item-title">Burger Master</h3>
+                                <div class="item-rating">
+                                    <i class="fas fa-star"></i> 4.5
+                                </div>
+                            </div>
+                            <p class="item-category">🍟 Comida Rápida</p>
+                            <p class="item-description">Hamburguesas gourmet con carne premium 100% de res. Combinaciones innovadoras que elevan la hamburguesa clásica a un nivel superior.</p>
+                            <div class="item-tags">
+                                <span class="tag">Hamburguesas</span>
+                                <span class="tag">Papas</span>
+                                <span class="tag">Delivery</span>
+                            </div>
+                        </div>
+                        <div class="item-footer">
+                            <div class="item-info">
+                                <span><i class="fas fa-clock"></i> 15-20 min</span>
+                                <span><i class="fas fa-dollar-sign"></i> $$</span>
+                                <span><i class="fas fa-comment"></i> 312 reseñas</span>
+                            </div>
+                            <button class="btn-view">Ver Detalles</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+<div class="hero-section">🍕</div>
+
+    <div class="container">
+        <div class="restaurant-header">
+            <div class="header-top">
+                <div>
+                    <h1 class="restaurant-name">La Bella Italia</h1>
+                    <span class="category-badge">🇮🇹 Cocina Italiana</span>
+                </div>
+                <div class="rating-large">
+                    <i class="fas fa-star"></i> 4.8
+                    <span style="font-size: 1rem; font-weight: 500;">(234 reseñas)</span>
+                </div>
+            </div>
+            <p class="restaurant-description">
+                Sumérgete en la auténtica experiencia italiana con nuestros platos tradicionales preparados con recetas familiares transmitidas por generaciones. Ingredientes frescos importados directamente desde Italia, pasta hecha a mano diariamente y un ambiente acogedor que te transportará a las calles de Roma.
+            </p>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-icon"><i class="fas fa-clock"></i></div>
+                    <div class="info-text">
+                        <h4>Tiempo de entrega</h4>
+                        <p>30-45 minutos</p>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon"><i class="fas fa-dollar-sign"></i></div>
+                    <div class="info-text">
+                        <h4>Rango de precio</h4>
+                        <p>$$ Moderado</p>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon"><i class="fas fa-map-marker-alt"></i></div>
+                    <div class="info-text">
+                        <h4>Ubicación</h4>
+                        <p>Centro, Calle 45 #23-15</p>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon"><i class="fas fa-phone"></i></div>
+                    <div class="info-text">
+                        <h4>Teléfono</h4>
+                        <p>+57 300 123 4567</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-grid">
+            <div>
+                <div class="menu-section">
+                    <h2 class="section-title">📋 Menú del Día</h2>
+                    
+                    <div class="menu-item">
+                        <div class="menu-item-info">
+                            <h4>Spaghetti Carbonara</h4>
+                            <p>Pasta fresca con panceta, huevo, queso parmesano y pimienta negra</p>
+                        </div>
+                        <div class="menu-item-price">$28.000</div>
+                    </div>
+
+                    <div class="menu-item">
+                        <div class="menu-item-info">
+                            <h4>Pizza Margherita</h4>
+                            <p>Salsa de tomate, mozzarella fresca, albahaca y aceite de oliva</p>
+                        </div>
+                        <div class="menu-item-price">$32.000</div>
+                    </div>
+
+                    <div class="menu-item">
+                        <div class="menu-item-info">
+                            <h4>Lasagna Bolognesa</h4>
+                            <p>Capas de pasta con ragú de carne, bechamel y queso gratinado</p>
+                        </div>
+                        <div class="menu-item-price">$35.000</div>
+                    </div>
+
+                    <div class="menu-item">
+                        <div class="menu-item-info">
+                            <h4>Risotto ai Funghi</h4>
+                            <p>Arroz cremoso con hongos porcini y trufa blanca</p>
+                        </div>
+                        <div class="menu-item-price">$38.000</div>
+                    </div>
+
+                    <div class="menu-item">
+                        <div class="menu-item-info">
+                            <h4>Tiramisu Casero</h4>
+                            <p>Delicioso postre italiano con café, mascarpone y cacao</p>
+                        </div>
+                        <div class="menu-item-price">$15.000</div>
+                    </div>
+                </div>
+
+                <div class="reviews-section">
+                    <h2 class="section-title">💬 Reseñas de Clientes</h2>
+
+                    <div class="review-card">
+                        <div class="review-header">
+                            <div class="reviewer-info">
+                                <div class="reviewer-avatar">MC</div>
+                                <div>
+                                    <div class="reviewer-name">María Contreras</div>
+                                    <div class="review-date">Hace 2 días</div>
+                                </div>
+                            </div>
+                            <div class="review-rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                        <p class="review-text">¡Excelente! La carbonara es auténtica y deliciosa. El servicio fue impecable y el ambiente muy acogedor. Definitivamente volveré.</p>
+                    </div>
+
+                    <div class="review-card">
+                        <div class="review-header">
+                            <div class="reviewer-info">
+                                <div class="reviewer-avatar">JR</div>
+                                <div>
+                                    <div class="reviewer-name">Juan Rodríguez</div>
+                                    <div class="review-date">Hace 5 días</div>
+                                </div>
+                            </div>
+                            <div class="review-rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="far fa-star"></i>
+                            </div>
+                        </div>
+                        <p class="review-text">Muy buena comida italiana. La pizza tiene una masa perfecta. Solo le faltó un poco más de rapidez en el servicio durante hora pico.</p>
+                    </div>
+
+                    <div class="review-card">
+                        <div class="review-header">
+                            <div class="reviewer-info">
+                                <div class="reviewer-avatar">LP</div>
+                                <div>
+                                    <div class="reviewer-name">Laura Pérez</div>
+                                    <div class="review-date">Hace 1 semana</div>
+                                </div>
+                            </div>
+                            <div class="review-rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                        <p class="review-text">El tiramisú está increíble, de los mejores que he probado. Los precios son justos para la calidad que ofrecen.</p>
+                    </div>
+                </div>
+            </div>
+
+            <aside>
+                <div class="sidebar-card">
+                    <h3 class="section-title">📊 Calificaciones</h3>
+                    <div class="rating-breakdown">
+                        <div class="rating-row">
+                            <span class="rating-label">5 ⭐</span>
+                            <div class="rating-bar">
+                                <div class="rating-fill" style="width: 75%"></div>
+                            </div>
+                            <span class="rating-count">175</span>
+                        </div>
+                        <div class="rating-row">
+                            <span class="rating-label">4 ⭐</span>
+                            <div class="rating-bar">
+                                <div class="rating-fill" style="width: 18%"></div>
+                            </div>
+                            <span class="rating-count">42</span>
+                        </div>
+                        <div class="rating-row">
+                            <span class="rating-label">3 ⭐</span>
+                            <div class="rating-bar">
+                                <div class="rating-fill" style="width: 5%"></div>
+                            </div>
+                            <span class="rating-count">12</span>
+                        </div>
+                        <div class="rating-row">
+                            <span class="rating-label">2 ⭐</span>
+                            <div class="rating-bar">
+                                <div class="rating-fill" style="width: 2%"></div>
+                            </div>
+                            <span class="rating-count">4</span>
+                        </div>
+                        <div class="rating-row">
+                            <span class="rating-label">1 ⭐</span>
+                            <div class="rating-bar">
+                                <div class="rating-fill" style="width: 0%"></div>
+                            </div>
+                            <span class="rating-count">1</span>
+                        </div>
+                    </div>
+                    <button class="btn-review">✍️ Escribir Reseña</button>
+                </div>
+
+                <div class="sidebar-card">
+                    <h3 class="section-title">🕐 Horarios</h3>
+                    <div class="opening-hours">
+                        <div class="hour-row">
+                            <strong>Lunes - Viernes</strong>
+                            <span>12:00 - 22:00</span>
+                        </div>
+                        <div class="hour-row">
+                            <strong>Sábado</strong>
+                            <span>12:00 - 23:00</span>
+                        </div>
+                        <div class="hour-row">
+                            <strong>Domingo</strong>
+                            <span>12:00 - 21:00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar-card">
+                    <h3 class="section-title">🎯 Características</h3>
+                    <div style="display: flex; flex-direction: column; gap: 0.8rem; margin-top: 1rem;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fas fa-check-circle" style="color: #4CAF50;"></i>
+                            <span>Entrega a domicilio</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fas fa-check-circle" style="color: #4CAF50;"></i>
+                            <span>Para llevar</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fas fa-check-circle" style="color: #4CAF50;"></i>
+                            <span>Reservaciones</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fas fa-check-circle" style="color: #4CAF50;"></i>
+                            <span>WiFi gratis</span>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+<script src="script.js"></script>
+</body>
+
+</html>
