@@ -55,9 +55,7 @@
     document.body.appendChild(modal);
   }
 
-  // =======================
-  // ⭐ Sistema de estrellas clickeables
-  // =======================
+
   const starContainer = modal.querySelector("#ratingStars");
   const hiddenInput = modal.querySelector("#calificacionRes");
 
@@ -69,13 +67,13 @@
         const value = parseInt(star.dataset.value, 10);
         hiddenInput.value = value;
 
-        // Pintar estrellas hasta la seleccionada
+    
         stars.forEach(s => {
           s.style.color = parseInt(s.dataset.value, 10) <= value ? "#f5c518" : "#ccc";
         });
       });
 
-      // Efecto hover para retroalimentación visual
+    
       star.addEventListener("mouseover", () => {
         const hoverValue = parseInt(star.dataset.value, 10);
         stars.forEach(s => {
