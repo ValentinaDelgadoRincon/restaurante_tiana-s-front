@@ -176,6 +176,134 @@
   cargarResenas();
 
 })();
+
+
+const REST_API = "http://localhost:4000/restaurantes";
+const searchInput = document.getElementById("searchInput");
+const resultadosContainer = document.getElementById("resultadosRestaurantes");
+const searchMessage = document.getElementById("searchMessage");
+
+let restaurantesBackend = [];
+let cardsLocales = [];
+
+window.addEventListener("DOMContentLoaded", async () => {
+  cardsLocales = Array.from(document.querySelectorAll(".restaurant-card"));
+  await cargarRestaurantesBackend();
+});
+
+
+async function cargarRestaurantesBackend() {
+  try {
+    const res = await fetch(REST_API);
+    if (!res.ok) throw new Error("Error al obtener restaurantes");
+    const data = await res.json();
+    restaurantesBackend = Array.isArray(data) ? data : [];
+  } catch (err) {
+    console.error("Error cargando restaurantes del backend:", err);
+    mostrarMensaje("No se pudieron cargar los restaurantes del servidor.", true);
+  }
+}
+
+
+if (searchInput) {
+  searchInput.addEventListener("input", () => {
+    const query = searchInput.value.trim().toLowerCase();
+    buscarRestaurantes(query);
+  });
+}
+
+
+function buscarRestaurantes(query) {
+  limpiarResultadosBackend();
+  mostrarMensaje("");
+
+  if (!query) {
+    cardsLocales.forEach(card => (card.style.display = ""));
+    mostrarMensaje("");
+    return;
+  }
+
+
+  let coincidenciasLocales = 0;
+  cardsLocales.forEach(card => {
+    const nombre = card.querySelector(".card-title")?.textContent?.toLowerCase() || "";
+    const categoria = card.querySelector(".card-category")?.textContent?.toLowerCase() || "";
+    const descripcion = card.querySelector(".card-description")?.textContent?.toLowerCase() || "";
+    const coincide = nombre.includes(query) || categoria.includes(query) || descripcion.includes(query);
+    card.style.display = coincide ? "" : "none";
+    if (coincide) coincidenciasLocales++;
+  });
+
+  const backendFiltrados = restaurantesBackend.filter(r =>
+    (r.nombre && r.nombre.toLowerCase().includes(query)) ||
+    (r.categoria && r.categoria.toLowerCase().includes(query)) ||
+    (r.descripcion && r.descripcion.toLowerCase().includes(query))
+  );
+
+ 
+  backendFiltrados.forEach(r => {
+    const yaExiste = cardsLocales.some(card =>
+      card.querySelector(".card-title")?.textContent?.trim().toLowerCase() === r.nombre?.toLowerCase()
+    );
+    if (!yaExiste) {
+      const card = crearCardBackend(r);
+      resultadosContainer.appendChild(card);
+    }
+  });
+
+  
+  const total = coincidenciasLocales + backendFiltrados.length;
+  if (total === 0) {
+    mostrarMensaje(`No se encontraron resultados para "${query}".`);
+  }
+}
+
+
+function crearCardBackend(r) {
+  const card = document.createElement("div");
+  card.className = "restaurant-card";
+  card.dataset.backend = "true";
+  card.innerHTML = `
+    <div class="card-image">
+      <img src="${r.imagen || "./multimedia/default.png"}" alt="${r.nombre}">
+    </div>
+    <div class="card-content">
+      <div class="card-header">
+        <h3 class="card-title">${r.nombre}</h3>
+        <div class="rating">
+          <i class="fas fa-star"></i> ${r.calificacion || "-"}
+        </div>
+      </div>
+      <p class="card-category">${r.categoria || ""}</p>
+      <p class="card-description">${r.descripcion || ""}</p>
+      <div class="card-footer">
+        <div class="card-info">
+          <span><i class="fas fa-dollar-sign"></i> $$</span>
+        </div>
+        <button class="btn-view">Ver Menú</button>
+      </div>
+    </div>
+  `;
+  return card;
+}
+
+
+function limpiarResultadosBackend() {
+  const cardsExtras = resultadosContainer.querySelectorAll(".restaurant-card[data-backend='true']");
+  cardsExtras.forEach(c => c.remove());
+}
+
+
+function mostrarMensaje(texto, esError = false) {
+  searchMessage.textContent = texto;
+  if (esError) {
+    searchMessage.classList.add("error");
+  } else {
+    searchMessage.classList.remove("error");
+  }
+}
+
+
 const sign_in_btn = document.querySelector("#sign-in-btn");
 const sign_up_btn = document.querySelector("#sign-up-btn");
 const container = document.querySelector(".container");

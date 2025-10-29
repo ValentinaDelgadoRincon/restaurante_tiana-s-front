@@ -22,9 +22,13 @@
         <h1>Descubre los mejores restaurantes</h1>
         <p>Explora, califica y disfruta de experiencias culinarias únicas</p>
         <div class="search-bar">
-            <input type="text" placeholder="Buscar restaurantes, platos, cocinas...">
-            <button><i class="fas fa-search"></i> Buscar</button>
-        </div>
+            <input id="searchInput" type="text" placeholder="Buscar restaurantes, platos, cocinas...">
+            <button id="searchBtn"><i class="fas fa-search"></i> Buscar</button>
+          </div>
+          <p id="searchMessage" class="search-message"></p>
+          
+          <section id="resultadosRestaurantes" class="restaurants-grid"></section>
+          
     </section>
 
     <section class="filters">
