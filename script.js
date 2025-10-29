@@ -1,56 +1,25 @@
 (function () {
   const API = "http://localhost:4000/resenias";
+
+
   let btn = document.querySelector('#btnEscribirResena') ||
             Array.from(document.querySelectorAll('button')).find(b =>
               b.textContent && b.textContent.trim().toLowerCase().includes('escribir reseña')
             );
 
   if (!btn) {
-    console.warn('No se encontró un botón con el texto "Escribir reseña". Añade uno o verifica su texto.');
+    console.warn('No se encontró el botón "Escribir reseña".');
     return;
   }
 
-  
-  let contenedorResenas = document.getElementById('resenas');
+ 
+  let contenedorResenas = document.querySelector('#reseñas .reviews-section');
   if (!contenedorResenas) {
-    
-    const section = document.createElement('section');
-    section.id = 'listaResenas';
-    section.className = 'resenas-container';
-    section.innerHTML = `<h3>Reseñas de nuestros clientes</h3><div id="resenas"></div>`;
-    btn.insertAdjacentElement('afterend', section);
-    contenedorResenas = document.getElementById('resenas');
+    console.warn('No se encontró la sección ".reviews-section" dentro de #reseñas.');
+    return;
   }
 
-  
-  if (!document.getElementById('estilos-modal-resenas')) {
-    const style = document.createElement('style');
-    style.id = 'estilos-modal-resenas';
-    style.textContent = `
-     
-      .modal-resena {
-        display: none; position: fixed; z-index: 9999; left:0; top:0; width:100%; height:100%;
-        background: rgba(165, 155, 160, 0.63); align-items: center; justify-content: center;
-      }
-      .modal-resena .modal-card {
-        background: rgba(241, 125, 187, 0.63); border-radius:10px; max-width:420px; width:90%; padding:18px; box-shadow:0 6px 30px rgba(0,0,0,0.3);
-      }
-      .modal-resena .close-x { float:right; font-size:20px; cursor:pointer; margin-top:-6px; }
-      .modal-resena label { display:block; margin:10px 0 6px; font-weight:600; }
-      .modal-resena input[type="text"], .modal-resena input[type="number"], .modal-resena textarea {
-        width:100%; padding:8px; border-radius:6px; border:1px solid #ccc; box-sizing:border-box;
-      }
-      .modal-resena button[type="submit"] {
-        margin-top:12px; padding:10px 14px; border:none; border-radius:8px; cursor:pointer; background:#764ba2; color:white;
-      }
-      .resenas-container { margin-top:18px; padding:12px; background:#ffffffcc; border-radius:8px; }
-      .resena { background:#f8f8f8; padding:12px; border-radius:6px; margin-bottom:10px; box-shadow:0 2px 6px rgba(0,0,0,0.06); }
-      .estrellas { color:#f5c518; font-size:16px; margin-bottom:6px; }
-    `;
-    document.head.appendChild(style);
-  }
 
-  
   let modal = document.querySelector('.modal-resena');
   if (!modal) {
     modal = document.createElement('div');
@@ -69,6 +38,8 @@
           <label for="comentarioRes">Reseña</label>
           <textarea id="comentarioRes" name="comentario" rows="4" required placeholder="Escribe tu opinión..."></textarea>
 
+          <p id="errorModalMsg" class="error-modal-msg" style="display:none;"></p>
+
           <button type="submit">Enviar reseña</button>
         </form>
       </div>
@@ -76,71 +47,124 @@
     document.body.appendChild(modal);
   }
 
+  // 🎨 Estilos del modal y reseñas
+  if (!document.getElementById('estilos-modal-resenas')) {
+    const style = document.createElement('style');
+    style.id = 'estilos-modal-resenas';
+    style.textContent = `
+      .modal-resena {
+        display:none; position:fixed; z-index:9999; left:0; top:0; width:100%; height:100%;
+        background:rgba(165,155,160,0.63); align-items:center; justify-content:center;
+      }
+      .modal-card {
+        background:rgba(241,125,187,0.95); border-radius:10px; max-width:420px; width:90%;
+        padding:20px; box-shadow:0 6px 30px rgba(0,0,0,0.3);
+      }
+      .close-x { float:right; font-size:22px; cursor:pointer; }
+      .modal-card h2 { margin-top:0; }
+      .modal-resena input, .modal-resena textarea {
+        width:100%; margin-top:6px; border-radius:6px; border:1px solid #ccc; padding:8px;
+      }
+      .modal-resena button[type="submit"] {
+        margin-top:12px; background:#764ba2; color:white; border:none;
+        border-radius:6px; padding:10px 16px; cursor:pointer;
+      }
+      .error-modal-msg {
+        color:#b30000; font-weight:600; margin:10px 0 0; text-align:center;
+      }
+      .resena { background:#fff; border-radius:8px; padding:12px; margin-bottom:10px;
+        box-shadow:0 2px 8px rgba(0,0,0,0.05);
+      }
+      .estrellas { color:#f5c518; margin-bottom:6px; }
+      .mensaje-resenas { text-align:center; font-weight:500; margin:12px 0; }
+      .mensaje-error { color:red; }
+    `;
+    document.head.appendChild(style);
+  }
+
   const form = document.getElementById('formResenaDin');
   const closeX = modal.querySelector('.close-x');
+  const errorModalMsg = modal.querySelector('#errorModalMsg');
 
-  
+
   btn.addEventListener('click', (e) => {
     e.preventDefault();
     modal.style.display = 'flex';
     document.getElementById('nombreRes').focus();
+    errorModalMsg.style.display = 'none';
   });
 
-  
   closeX.addEventListener('click', () => modal.style.display = 'none');
-  modal.addEventListener('click', (ev) => {
-    if (ev.target === modal) modal.style.display = 'none';
-  });
-  document.addEventListener('keydown', (ev) => {
-    if (ev.key === 'Escape') modal.style.display = 'none';
-  });
+  modal.addEventListener('click', (ev) => { if (ev.target === modal) modal.style.display = 'none'; });
+  document.addEventListener('keydown', (ev) => { if (ev.key === 'Escape') modal.style.display = 'none'; });
 
-  
   async function cargarResenas() {
     try {
       const res = await fetch(API);
-      if (!res.ok) throw new Error('GET no OK: ' + res.status);
+      if (!res.ok) throw new Error('Error en la solicitud: ' + res.status);
       const data = await res.json();
       renderResenas(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error('Error cargando reseñas:', err);
-      contenedorResenas.innerHTML = '<p>No se pudieron cargar las reseñas. Asegúrate que el backend esté corriendo en http://localhost:4000</p>';
+      mostrarMensajeResenas('No se pudieron cargar las reseñas. Verifica el servidor.', true);
     }
   }
 
+
   function renderResenas(items) {
-    contenedorResenas.innerHTML = '';
+    contenedorResenas.innerHTML = '<h2 class="section-title">💬 Reseñas de Clientes</h2>';
+
     if (!items.length) {
-      contenedorResenas.innerHTML = '<p>No hay reseñas todavía.</p>';
+      mostrarMensajeResenas('No hay reseñas todavía.');
       return;
     }
+
     items.forEach(r => {
-      const d = document.createElement('div');
-      d.className = 'resena';
-      const estrellas = (Number.isInteger(r.calificacion) && r.calificacion > 0) ? '⭐'.repeat(Math.min(5, r.calificacion)) : '';
-      d.innerHTML = `
-        <h4>${escapeHtml(String(r.nombre || 'Anónimo'))}</h4>
-        <div class="estrellas">${estrellas}</div>
-        <p>${escapeHtml(String(r.comentario || ''))}</p>
+      const card = document.createElement('div');
+      card.className = 'review-card';
+      card.innerHTML = `
+        <div class="review-header">
+          <div class="reviewer-info">
+            <div class="reviewer-avatar">${r.nombre?.[0]?.toUpperCase() || 'U'}</div>
+            <div>
+              <div class="reviewer-name">${escapeHtml(r.nombre || 'Anónimo')}</div>
+              <div class="review-date">Reciente</div>
+            </div>
+          </div>
+          <div class="review-rating">${'⭐'.repeat(r.calificacion || 0)}</div>
+        </div>
+        <p class="review-text">${escapeHtml(r.comentario || '')}</p>
       `;
-      contenedorResenas.appendChild(d);
+      contenedorResenas.appendChild(card);
     });
   }
 
-  
-  function escapeHtml(s) {
-    return s.replace(/[&<>"']/g, (m) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m]);
+ 
+  function mostrarMensajeResenas(texto, esError = false) {
+    const msg = document.createElement('p');
+    msg.className = `mensaje-resenas ${esError ? 'mensaje-error' : ''}`;
+    msg.textContent = texto;
+    contenedorResenas.appendChild(msg);
   }
 
- 
+
+  function escapeHtml(s) {
+    return s.replace(/[&<>"']/g, (m) => (
+      { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]
+    ));
+  }
+
+
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
+    errorModalMsg.style.display = 'none';
     const nombre = document.getElementById('nombreRes').value.trim();
     const calificacion = parseInt(document.getElementById('calificacionRes').value || '0', 10);
     const comentario = document.getElementById('comentarioRes').value.trim();
 
-    if (!nombre || !comentario || !calificacion || calificacion < 1 || calificacion > 5) {
-      alert('Por favor completa todos los campos y usa una calificación entre 1 y 5.');
+    if (!nombre || !comentario || calificacion < 1 || calificacion > 5) {
+      errorModalMsg.textContent = 'Por favor completa todos los campos y usa una calificación válida (1–5).';
+      errorModalMsg.style.display = 'block';
       return;
     }
 
@@ -153,29 +177,23 @@
         body: JSON.stringify(payload)
       });
 
-      if (!res.ok) {
-        
-        let msg = `Error ${res.status}`;
-        try { const j = await res.json(); if (j && j.message) msg = j.message; } catch(_) {}
-        throw new Error(msg);
-      }
+      if (!res.ok) throw new Error(`Error ${res.status}`);
 
-      
       modal.style.display = 'none';
       form.reset();
       await cargarResenas();
-      
-      alert('Reseña enviada con éxito');
+      alert('Reseña enviada con éxito.');
     } catch (err) {
       console.error('Error enviando reseña:', err);
-      alert('No se pudo enviar la reseña. Verifica que el backend esté corriendo y acepte POST a ' + API);
+      errorModalMsg.textContent = 'No se pudo enviar la reseña. Verifica tu conexión o el servidor.';
+      errorModalMsg.style.display = 'block';
     }
   });
 
- 
-  cargarResenas();
 
+  cargarResenas();
 })();
+
 
 
 const REST_API = "http://localhost:4000/restaurantes";
