@@ -3,16 +3,16 @@
 
 
   let btn = document.querySelector('#btnEscribirResena') ||
-            Array.from(document.querySelectorAll('button')).find(b =>
-              b.textContent && b.textContent.trim().toLowerCase().includes('escribir reseña')
-            );
+    Array.from(document.querySelectorAll('button')).find(b =>
+      b.textContent && b.textContent.trim().toLowerCase().includes('escribir reseña')
+    );
 
   if (!btn) {
     console.warn('No se encontró el botón "Escribir reseña".');
     return;
   }
 
- 
+
   let contenedorResenas = document.querySelector('#reseñas .reviews-section');
   if (!contenedorResenas) {
     console.warn('No se encontró la sección ".reviews-section" dentro de #reseñas.');
@@ -32,8 +32,16 @@
           <label for="nombreRes">Tu nombre</label>
           <input id="nombreRes" name="nombre" type="text" required placeholder="Tu nombre">
 
-          <label for="calificacionRes">Calificación (1-5)</label>
-          <input id="calificacionRes" name="calificacion" type="number" min="1" max="5" required value="5">
+         <label>Calificación</label>
+<div id="ratingStars" class="rating-stars">
+  <i class="fas fa-star" data-value="1"></i>
+  <i class="fas fa-star" data-value="2"></i>
+  <i class="fas fa-star" data-value="3"></i>
+  <i class="fas fa-star" data-value="4"></i>
+  <i class="fas fa-star" data-value="5"></i>
+</div>
+<input type="hidden" id="calificacionRes" name="calificacion" value="0" required>
+
 
           <label for="comentarioRes">Reseña</label>
           <textarea id="comentarioRes" name="comentario" rows="4" required placeholder="Escribe tu opinión..."></textarea>
@@ -47,7 +55,43 @@
     document.body.appendChild(modal);
   }
 
-  // 🎨 Estilos del modal y reseñas
+  // =======================
+  // ⭐ Sistema de estrellas clickeables
+  // =======================
+  const starContainer = modal.querySelector("#ratingStars");
+  const hiddenInput = modal.querySelector("#calificacionRes");
+
+  if (starContainer) {
+    const stars = Array.from(starContainer.querySelectorAll("i"));
+
+    stars.forEach(star => {
+      star.addEventListener("click", () => {
+        const value = parseInt(star.dataset.value, 10);
+        hiddenInput.value = value;
+
+        // Pintar estrellas hasta la seleccionada
+        stars.forEach(s => {
+          s.style.color = parseInt(s.dataset.value, 10) <= value ? "#f5c518" : "#ccc";
+        });
+      });
+
+      // Efecto hover para retroalimentación visual
+      star.addEventListener("mouseover", () => {
+        const hoverValue = parseInt(star.dataset.value, 10);
+        stars.forEach(s => {
+          s.style.color = parseInt(s.dataset.value, 10) <= hoverValue ? "#f5c518" : "#ccc";
+        });
+      });
+
+      star.addEventListener("mouseout", () => {
+        const currentValue = parseInt(hiddenInput.value, 10);
+        stars.forEach(s => {
+          s.style.color = parseInt(s.dataset.value, 10) <= currentValue ? "#f5c518" : "#ccc";
+        });
+      });
+    });
+  }
+
   if (!document.getElementById('estilos-modal-resenas')) {
     const style = document.createElement('style');
     style.id = 'estilos-modal-resenas';
@@ -139,7 +183,7 @@
     });
   }
 
- 
+
   function mostrarMensajeResenas(texto, esError = false) {
     const msg = document.createElement('p');
     msg.className = `mensaje-resenas ${esError ? 'mensaje-error' : ''}`;
@@ -258,7 +302,7 @@ function buscarRestaurantes(query) {
     (r.descripcion && r.descripcion.toLowerCase().includes(query))
   );
 
- 
+
   backendFiltrados.forEach(r => {
     const yaExiste = cardsLocales.some(card =>
       card.querySelector(".card-title")?.textContent?.trim().toLowerCase() === r.nombre?.toLowerCase()
@@ -269,7 +313,7 @@ function buscarRestaurantes(query) {
     }
   });
 
-  
+
   const total = coincidenciasLocales + backendFiltrados.length;
   if (total === 0) {
     mostrarMensaje(`No se encontraron resultados para "${query}".`);
