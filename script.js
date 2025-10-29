@@ -1,10 +1,12 @@
 (function () {
   const API = "http://localhost:4000/resenias";
 
-
-  let btn = document.querySelector('#btnEscribirResena') ||
-    Array.from(document.querySelectorAll('button')).find(b =>
-      b.textContent && b.textContent.trim().toLowerCase().includes('escribir reseña')
+  let btn =
+    document.querySelector("#btnEscribirResena") ||
+    Array.from(document.querySelectorAll("button")).find(
+      (b) =>
+        b.textContent &&
+        b.textContent.trim().toLowerCase().includes("escribir reseña")
     );
 
   if (!btn) {
@@ -12,18 +14,18 @@
     return;
   }
 
-
-  let contenedorResenas = document.querySelector('#reseñas .reviews-section');
+  let contenedorResenas = document.querySelector("#reseñas .reviews-section");
   if (!contenedorResenas) {
-    console.warn('No se encontró la sección ".reviews-section" dentro de #reseñas.');
+    console.warn(
+      'No se encontró la sección ".reviews-section" dentro de #reseñas.'
+    );
     return;
   }
 
-
-  let modal = document.querySelector('.modal-resena');
+  let modal = document.querySelector(".modal-resena");
   if (!modal) {
-    modal = document.createElement('div');
-    modal.className = 'modal-resena';
+    modal = document.createElement("div");
+    modal.className = "modal-resena";
     modal.innerHTML = `
       <div class="modal-card" role="dialog" aria-modal="true">
         <span class="close-x" title="Cerrar">&times;</span>
@@ -55,44 +57,44 @@
     document.body.appendChild(modal);
   }
 
-
   const starContainer = modal.querySelector("#ratingStars");
   const hiddenInput = modal.querySelector("#calificacionRes");
 
   if (starContainer) {
     const stars = Array.from(starContainer.querySelectorAll("i"));
 
-    stars.forEach(star => {
+    stars.forEach((star) => {
       star.addEventListener("click", () => {
         const value = parseInt(star.dataset.value, 10);
         hiddenInput.value = value;
 
-    
-        stars.forEach(s => {
-          s.style.color = parseInt(s.dataset.value, 10) <= value ? "#f5c518" : "#ccc";
+        stars.forEach((s) => {
+          s.style.color =
+            parseInt(s.dataset.value, 10) <= value ? "#f5c518" : "#ccc";
         });
       });
 
-    
       star.addEventListener("mouseover", () => {
         const hoverValue = parseInt(star.dataset.value, 10);
-        stars.forEach(s => {
-          s.style.color = parseInt(s.dataset.value, 10) <= hoverValue ? "#f5c518" : "#ccc";
+        stars.forEach((s) => {
+          s.style.color =
+            parseInt(s.dataset.value, 10) <= hoverValue ? "#f5c518" : "#ccc";
         });
       });
 
       star.addEventListener("mouseout", () => {
         const currentValue = parseInt(hiddenInput.value, 10);
-        stars.forEach(s => {
-          s.style.color = parseInt(s.dataset.value, 10) <= currentValue ? "#f5c518" : "#ccc";
+        stars.forEach((s) => {
+          s.style.color =
+            parseInt(s.dataset.value, 10) <= currentValue ? "#f5c518" : "#ccc";
         });
       });
     });
   }
 
-  if (!document.getElementById('estilos-modal-resenas')) {
-    const style = document.createElement('style');
-    style.id = 'estilos-modal-resenas';
+  if (!document.getElementById("estilos-modal-resenas")) {
+    const style = document.createElement("style");
+    style.id = "estilos-modal-resenas";
     style.textContent = `
       .modal-resena {
         display:none; position:fixed; z-index:9999; left:0; top:0; width:100%; height:100%;
@@ -124,89 +126,201 @@
     document.head.appendChild(style);
   }
 
-  const form = document.getElementById('formResenaDin');
-  const closeX = modal.querySelector('.close-x');
-  const errorModalMsg = modal.querySelector('#errorModalMsg');
+  const form = document.getElementById("formResenaDin");
+  const closeX = modal.querySelector(".close-x");
+  const errorModalMsg = modal.querySelector("#errorModalMsg");
 
-
-  btn.addEventListener('click', (e) => {
+  btn.addEventListener("click", (e) => {
     e.preventDefault();
-    modal.style.display = 'flex';
-    document.getElementById('nombreRes').focus();
-    errorModalMsg.style.display = 'none';
+    modal.style.display = "flex";
+    document.getElementById("nombreRes").focus();
+    errorModalMsg.style.display = "none";
   });
 
-  closeX.addEventListener('click', () => modal.style.display = 'none');
-  modal.addEventListener('click', (ev) => { if (ev.target === modal) modal.style.display = 'none'; });
-  document.addEventListener('keydown', (ev) => { if (ev.key === 'Escape') modal.style.display = 'none'; });
+  closeX.addEventListener("click", () => (modal.style.display = "none"));
+  modal.addEventListener("click", (ev) => {
+    if (ev.target === modal) modal.style.display = "none";
+  });
+  document.addEventListener("keydown", (ev) => {
+    if (ev.key === "Escape") modal.style.display = "none";
+  });
 
   async function cargarResenas() {
     try {
       const res = await fetch(API);
-      if (!res.ok) throw new Error('Error en la solicitud: ' + res.status);
+      if (!res.ok) throw new Error("Error en la solicitud: " + res.status);
       const data = await res.json();
       renderResenas(Array.isArray(data) ? data : []);
     } catch (err) {
-      console.error('Error cargando reseñas:', err);
-      mostrarMensajeResenas('No se pudieron cargar las reseñas. Verifica el servidor.', true);
+      console.error("Error cargando reseñas:", err);
+      mostrarMensajeResenas(
+        "No se pudieron cargar las reseñas. Verifica el servidor.",
+        true
+      );
     }
   }
 
+  
+  window.addEventListener("DOMContentLoaded", () => {
+    const reseñasLocales = document.querySelectorAll(
+      ".review-card:not([data-id])"
+    );
+
+    reseñasLocales.forEach((card, index) => {
+      const id = `local_${index}`;
+      card.dataset.id = id;
+
+     
+      if (!card.querySelector(".review-actions")) {
+        const actions = document.createElement("div");
+        actions.className = "review-actions";
+        actions.innerHTML = `
+        <button class="btn-like" data-id="${id}" title="Me gusta">👍 <span>0</span></button>
+        <button class="btn-dislike" data-id="${id}" title="No me gusta">👎 <span>0</span></button>
+      `;
+        card.appendChild(actions);
+      }
+    });
+
+    
+    if (typeof activarBotonesReaccion === "function") {
+      activarBotonesReaccion();
+    }
+  });
 
   function renderResenas(items) {
-    contenedorResenas.innerHTML = '<h2 class="section-title">💬 Reseñas de Clientes</h2>';
+    contenedorResenas.innerHTML =
+      '<h2 class="section-title">💬 Reseñas de Clientes</h2>';
 
     if (!items.length) {
-      mostrarMensajeResenas('No hay reseñas todavía.');
+      mostrarMensajeResenas("No hay reseñas todavía.");
       return;
     }
 
-    items.forEach(r => {
-      const card = document.createElement('div');
-      card.className = 'review-card';
+    items.forEach((r) => {
+      const id = r.id || r._id || crypto.randomUUID(); 
+      const likes = r.likes || 0;
+      const dislikes = r.dislikes || 0;
+
+      const card = document.createElement("div");
+      card.className = "review-card";
+      card.dataset.id = id;
+
       card.innerHTML = `
-        <div class="review-header">
-          <div class="reviewer-info">
-            <div class="reviewer-avatar">${r.nombre?.[0]?.toUpperCase() || 'U'}</div>
-            <div>
-              <div class="reviewer-name">${escapeHtml(r.nombre || 'Anónimo')}</div>
-              <div class="review-date">Reciente</div>
-            </div>
+      <div class="review-header">
+        <div class="reviewer-info">
+          <div class="reviewer-avatar">${
+            r.nombre?.[0]?.toUpperCase() || "U"
+          }</div>
+          <div>
+            <div class="reviewer-name">${escapeHtml(
+              r.nombre || "Anónimo"
+            )}</div>
+            <div class="review-date">Reciente</div>
           </div>
-          <div class="review-rating">${'⭐'.repeat(r.calificacion || 0)}</div>
         </div>
-        <p class="review-text">${escapeHtml(r.comentario || '')}</p>
-      `;
+        <div class="review-rating">${"⭐".repeat(r.calificacion || 0)}</div>
+      </div>
+      <p class="review-text">${escapeHtml(r.comentario || "")}</p>
+      <div class="review-actions">
+        <button class="btn-like" data-id="${id}" title="Me gusta">👍 <span>${likes}</span></button>
+        <button class="btn-dislike" data-id="${id}" title="No me gusta">👎 <span>${dislikes}</span></button>
+      </div>
+    `;
+
       contenedorResenas.appendChild(card);
+    });
+
+    activarBotonesReaccion();
+  }
+  function activarBotonesReaccion() {
+    const likeBtns = contenedorResenas.querySelectorAll(".btn-like");
+    const dislikeBtns = contenedorResenas.querySelectorAll(".btn-dislike");
+
+    likeBtns.forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        const id = btn.dataset.id;
+        const key = `reseña_voto_${id}`;
+        if (localStorage.getItem(key))
+          return alert("Ya votaste esta reseña 👍");
+
+        const countEl = btn.querySelector("span");
+        let likes = parseInt(countEl.textContent) + 1;
+        countEl.textContent = likes;
+        localStorage.setItem(key, "like");
+
+        try {
+          await fetch(`${API}/${id}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ likes }),
+          });
+        } catch (err) {
+          console.error("Error actualizando like:", err);
+        }
+      });
+    });
+
+    dislikeBtns.forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        const id = btn.dataset.id;
+        const key = `reseña_voto_${id}`;
+        if (localStorage.getItem(key))
+          return alert("Ya votaste esta reseña 👎");
+
+        const countEl = btn.querySelector("span");
+        let dislikes = parseInt(countEl.textContent) + 1;
+        countEl.textContent = dislikes;
+        localStorage.setItem(key, "dislike");
+
+        try {
+          await fetch(`${API}/${id}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ dislikes }),
+          });
+        } catch (err) {
+          console.error("Error actualizando dislike:", err);
+        }
+      });
     });
   }
 
-
   function mostrarMensajeResenas(texto, esError = false) {
-    const msg = document.createElement('p');
-    msg.className = `mensaje-resenas ${esError ? 'mensaje-error' : ''}`;
+    const msg = document.createElement("p");
+    msg.className = `mensaje-resenas ${esError ? "mensaje-error" : ""}`;
     msg.textContent = texto;
     contenedorResenas.appendChild(msg);
   }
 
-
   function escapeHtml(s) {
-    return s.replace(/[&<>"']/g, (m) => (
-      { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]
-    ));
+    return s.replace(
+      /[&<>"']/g,
+      (m) =>
+        ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;",
+        }[m])
+    );
   }
 
-
-  form.addEventListener('submit', async (e) => {
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
-    errorModalMsg.style.display = 'none';
-    const nombre = document.getElementById('nombreRes').value.trim();
-    const calificacion = parseInt(document.getElementById('calificacionRes').value || '0', 10);
-    const comentario = document.getElementById('comentarioRes').value.trim();
+    errorModalMsg.style.display = "none";
+    const nombre = document.getElementById("nombreRes").value.trim();
+    const calificacion = parseInt(
+      document.getElementById("calificacionRes").value || "0",
+      10
+    );
+    const comentario = document.getElementById("comentarioRes").value.trim();
 
     if (!nombre || !comentario || calificacion < 1 || calificacion > 5) {
-      errorModalMsg.textContent = 'Por favor completa todos los campos y usa una calificación válida (1–5).';
-      errorModalMsg.style.display = 'block';
+      errorModalMsg.textContent =
+        "Por favor completa todos los campos y usa una calificación válida (1–5).";
+      errorModalMsg.style.display = "block";
       return;
     }
 
@@ -214,24 +328,24 @@
 
     try {
       const res = await fetch(API, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
       });
 
       if (!res.ok) throw new Error(`Error ${res.status}`);
 
-      modal.style.display = 'none';
+      modal.style.display = "none";
       form.reset();
       await cargarResenas();
-      alert('Reseña enviada con éxito.');
+      alert("Reseña enviada con éxito.");
     } catch (err) {
-      console.error('Error enviando reseña:', err);
-      errorModalMsg.textContent = 'No se pudo enviar la reseña. Verifica tu conexión o el servidor.';
-      errorModalMsg.style.display = 'block';
+      console.error("Error enviando reseña:", err);
+      errorModalMsg.textContent =
+        "No se pudo enviar la reseña. Verifica tu conexión o el servidor.";
+      errorModalMsg.style.display = "block";
     }
   });
-
 
   cargarResenas();
 })();

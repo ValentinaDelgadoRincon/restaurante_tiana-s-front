@@ -886,3 +886,27 @@ body {
     color: red;
   }
   
+  .review-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 8px;
+  }
+
+  .btn-like,
+  .btn-dislike {
+      background: #eee;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      padding: 6px 12px;
+      font-size: 16px;
+      transition: background 0.2s;
+  }
+
+  .btn-like:hover {
+      background: #c0f2c0;
+  }
+
+  .btn-dislike:hover {
+      background: #f2c0c0;
+  }
