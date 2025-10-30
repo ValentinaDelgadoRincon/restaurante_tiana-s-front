@@ -1,5 +1,7 @@
+const API = "https://restaurante-tiana-s-backend.onrender.com";
+
 (function () {
-  const API = "http://localhost:4000/resenias";
+  const API = `${API}/resenias`;
 
   let btn =
     document.querySelector("#btnEscribirResena") ||
@@ -304,7 +306,7 @@
 
 
 
-const REST_API = "http://localhost:4000/restaurantes";
+const REST_API = `${API}/restaurantes`;
 const searchInput = document.getElementById("searchInput");
 const resultadosContainer = document.getElementById("resultadosRestaurantes");
 const searchMessage = document.getElementById("searchMessage");
@@ -527,7 +529,7 @@ const errorAdminMsg = document.getElementById("errorAdminMsg");
     }
 
     try {
-      const res = await fetch("http://localhost:4000/admin", {
+      const res = await fetch(`${API}/admin`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
