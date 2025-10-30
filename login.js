@@ -1,5 +1,3 @@
-const API = "https://restaurante-tiana-s-backend.onrender.com";
-
 (function () {
   const loginForm = document.getElementById("loginForm");
   const errorLoginMsg = document.getElementById("errorLoginUserMsg");
@@ -20,7 +18,7 @@ const API = "https://restaurante-tiana-s-backend.onrender.com";
     }
 
     try {
-      const res = await fetch(`${API}/login`, {
+      const res = await fetch("http://localhost:4000/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
