@@ -1,3 +1,26 @@
+function getAuthToken() {
+  const authData = sessionStorage.getItem("authData");
+  if (!authData) return null;
+  try {
+    const data = JSON.parse(authData);
+    return data.token;
+  } catch (e) {
+    console.error("Error parsing auth token:", e);
+    return null;
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const token = getAuthToken();
+  if (!token) {
+    
+    window.location.href = "./index.html";
+    return;
+  }
+  
+  cargarResenas();
+});
+
 (function () {
   const API = "http://localhost:4000/api/v1/resenias";
 
@@ -27,33 +50,33 @@
     modal = document.createElement("div");
     modal.className = "modal-resena";
     modal.innerHTML = `
-      <div class="modal-card" role="dialog" aria-modal="true">
-        <span class="close-x" title="Cerrar">&times;</span>
-        <h2>Escribir reseña</h2>
-        <form id="formResenaDin">
-          <label for="nombreRes">Tu nombre</label>
-          <input id="nombreRes" name="nombre" type="text" required placeholder="Tu nombre">
+<div class="modal-card" role="dialog" aria-modal="true">
+<span class="close-x" title="Cerrar">&times;</span>
+<h2>Escribir reseña</h2>
+<form id="formResenaDin">
+<label for="nombreRes">Tu nombre</label>
+<input id="nombreRes" name="nombre" type="text" required placeholder="Tu nombre">
 
-         <label>Calificación</label>
+<label>Calificación</label>
 <div id="ratingStars" class="rating-stars">
-  <i class="fas fa-star" data-value="1"></i>
-  <i class="fas fa-star" data-value="2"></i>
-  <i class="fas fa-star" data-value="3"></i>
-  <i class="fas fa-star" data-value="4"></i>
-  <i class="fas fa-star" data-value="5"></i>
+<i class="fas fa-star" data-value="1"></i>
+<i class="fas fa-star" data-value="2"></i>
+<i class="fas fa-star" data-value="3"></i>
+<i class="fas fa-star" data-value="4"></i>
+<i class="fas fa-star" data-value="5"></i>
 </div>
 <input type="hidden" id="calificacionRes" name="calificacion" value="0" required>
 
 
-          <label for="comentarioRes">Reseña</label>
-          <textarea id="comentarioRes" name="comentario" rows="4" required placeholder="Escribe tu opinión..."></textarea>
+<label for="comentarioRes">Reseña</label>
+<textarea id="comentarioRes" name="comentario" rows="4" required placeholder="Escribe tu opinión..."></textarea>
 
-          <p id="errorModalMsg" class="error-modal-msg" style="display:none;"></p>
+<p id="errorModalMsg" class="error-modal-msg" style="display:none;"></p>
 
-          <button type="submit">Enviar reseña</button>
-        </form>
-      </div>
-    `;
+<button type="submit">Enviar reseña</button>
+</form>
+</div>
+`;
     document.body.appendChild(modal);
   }
 
@@ -96,33 +119,33 @@
     const style = document.createElement("style");
     style.id = "estilos-modal-resenas";
     style.textContent = `
-      .modal-resena {
-        display:none; position:fixed; z-index:9999; left:0; top:0; width:100%; height:100%;
-        background:rgba(165,155,160,0.63); align-items:center; justify-content:center;
-      }
-      .modal-card {
-        background:rgba(241,125,187,0.95); border-radius:10px; max-width:420px; width:90%;
-        padding:20px; box-shadow:0 6px 30px rgba(0,0,0,0.3);
-      }
-      .close-x { float:right; font-size:22px; cursor:pointer; }
-      .modal-card h2 { margin-top:0; }
-      .modal-resena input, .modal-resena textarea {
-        width:100%; margin-top:6px; border-radius:6px; border:1px solid #ccc; padding:8px;
-      }
-      .modal-resena button[type="submit"] {
-        margin-top:12px; background:#764ba2; color:white; border:none;
-        border-radius:6px; padding:10px 16px; cursor:pointer;
-      }
-      .error-modal-msg {
-        color:#b30000; font-weight:600; margin:10px 0 0; text-align:center;
-      }
-      .resena { background:#fff; border-radius:8px; padding:12px; margin-bottom:10px;
-        box-shadow:0 2px 8px rgba(0,0,0,0.05);
-      }
-      .estrellas { color:#f5c518; margin-bottom:6px; }
-      .mensaje-resenas { text-align:center; font-weight:500; margin:12px 0; }
-      .mensaje-error { color:red; }
-    `;
+.modal-resena {
+display:none; position:fixed; z-index:9999; left:0; top:0; width:100%; height:100%;
+background:rgba(165,155,160,0.63); align-items:center; justify-content:center;
+}
+.modal-card {
+background:rgba(241,125,187,0.95); border-radius:10px; max-width:420px; width:90%;
+padding:20px; box-shadow:0 6px 30px rgba(0,0,0,0.3);
+}
+.close-x { float:right; font-size:22px; cursor:pointer; }
+.modal-card h2 { margin-top:0; }
+.modal-resena input, .modal-resena textarea {
+width:100%; margin-top:6px; border-radius:6px; border:1px solid #ccc; padding:8px;
+}
+.modal-resena button[type="submit"] {
+margin-top:12px; background:#764ba2; color:white; border:none;
+border-radius:6px; padding:10px 16px; cursor:pointer;
+}
+.error-modal-msg {
+color:#b30000; font-weight:600; margin:10px 0 0; text-align:center;
+}
+.resena { background:#fff; border-radius:8px; padding:12px; margin-bottom:10px;
+box-shadow:0 2px 8px rgba(0,0,0,0.05);
+}
+.estrellas { color:#f5c518; margin-bottom:6px; }
+.mensaje-resenas { text-align:center; font-weight:500; margin:12px 0; }
+.mensaje-error { color:red; }
+`;
     document.head.appendChild(style);
   }
 
@@ -145,9 +168,18 @@
     if (ev.key === "Escape") modal.style.display = "none";
   });
 
+  
   async function cargarResenas() {
     try {
-      const res = await fetch(API);
+      const token = getAuthToken();
+      if (!token) throw new Error("No hay token de autenticación");
+
+      const res = await fetch(API, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
       if (!res.ok) throw new Error("Error en la solicitud: " + res.status);
       const data = await res.json();
       renderResenas(Array.isArray(data) ? data : []);
@@ -265,12 +297,25 @@
       return;
     }
 
-    const payload = { nombre, calificacion, comentario, platoId, restauranteId, usuarioId };
+    const payload = {
+      nombre,
+      calificacion,
+      comentario,
+      platoId,
+      restauranteId,
+      usuarioId,
+    };
 
     try {
+      const token = getAuthToken();
+      if (!token) throw new Error("No hay token de autenticación");
+
       const res = await fetch(API, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(payload),
       });
 
@@ -304,12 +349,22 @@ window.addEventListener("DOMContentLoaded", async () => {
   await cargarRestaurantesBackend();
 });
 
+
 async function cargarRestaurantesBackend() {
   try {
-    const res = await fetch(REST_API);
+    const token = getAuthToken();
+    if (!token) throw new Error("No hay token de autenticación");
+
+    const res = await fetch(REST_API, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
     if (!res.ok) throw new Error("Error al obtener restaurantes");
     const data = await res.json();
     restaurantesBackend = Array.isArray(data) ? data : [];
+    renderizarRestaurantes(restaurantesBackend); 
   } catch (err) {
     console.error("Error cargando restaurantes del backend:", err);
     mostrarMensaje(
@@ -319,216 +374,90 @@ async function cargarRestaurantesBackend() {
   }
 }
 
-if (searchInput) {
-  searchInput.addEventListener("input", () => {
-    const query = searchInput.value.trim().toLowerCase();
-    buscarRestaurantes(query);
-  });
-}
 
-function buscarRestaurantes(query) {
-  limpiarResultadosBackend();
-  mostrarMensaje("");
+function renderizarRestaurantes(restaurantes) {
+  const container =
+    document.getElementById("restaurantes-container") || resultadosContainer;
 
-  if (!query) {
-    cardsLocales.forEach((card) => (card.style.display = ""));
-    mostrarMensaje("");
+  
+  container.innerHTML = "";
+
+  if (!restaurantes.length) {
+    container.innerHTML =
+      '<p class="no-results">No hay restaurantes disponibles</p>';
     return;
   }
 
-  let coincidenciasLocales = 0;
-  cardsLocales.forEach((card) => {
-    const nombre =
-      card.querySelector(".card-title")?.textContent?.toLowerCase() || "";
-    const categoria =
-      card.querySelector(".card-category")?.textContent?.toLowerCase() || "";
-    const descripcion =
-      card.querySelector(".card-description")?.textContent?.toLowerCase() || "";
-    const coincide =
-      nombre.includes(query) ||
-      categoria.includes(query) ||
-      descripcion.includes(query);
-    card.style.display = coincide ? "" : "none";
-    if (coincide) coincidenciasLocales++;
+  restaurantes.forEach((restaurante) => {
+    const card = crearCardBackend(restaurante);
+    container.appendChild(card);
   });
-
-  const backendFiltrados = restaurantesBackend.filter(
-    (r) =>
-      (r.nombre && r.nombre.toLowerCase().includes(query)) ||
-      (r.categoria && r.categoria.toLowerCase().includes(query)) ||
-      (r.descripcion && r.descripcion.toLowerCase().includes(query))
-  );
-
-  backendFiltrados.forEach((r) => {
-    const yaExiste = cardsLocales.some(
-      (card) =>
-        card.querySelector(".card-title")?.textContent?.trim().toLowerCase() ===
-        r.nombre?.toLowerCase()
-    );
-    if (!yaExiste) {
-      const card = crearCardBackend(r);
-      resultadosContainer.appendChild(card);
-    }
-  });
-
-  const total = coincidenciasLocales + backendFiltrados.length;
-  if (total === 0) {
-    mostrarMensaje(`No se encontraron resultados para "${query}".`);
-  }
 }
+
 
 function crearCardBackend(r) {
   const card = document.createElement("div");
   card.className = "restaurant-card";
   card.dataset.backend = "true";
   card.innerHTML = `
-    <div class="card-image">
-      <img src="${r.imagen || "./multimedia/default.png"}" alt="${r.nombre}">
-    </div>
-    <div class="card-content">
-      <div class="card-header">
-        <h3 class="card-title">${r.nombre}</h3>
-        <div class="rating">
-          <i class="fas fa-star"></i> ${r.calificacion || "-"}
-        </div>
-      </div>
-      <p class="card-category">${r.categoria || ""}</p>
-      <p class="card-description">${r.descripcion || ""}</p>
-      <div class="card-footer">
-        <div class="card-info">
-          <span><i class="fas fa-dollar-sign"></i> $$</span>
-        </div>
-        <button class="btn-view">Ver Menú</button>
-      </div>
-    </div>
-  `;
-  return card;
+<div class="card-content">
+<div class="card-header">
+<h3 class="card-title">${r.nombre}</h3>
+</div>
+<p class="card-category">${r.categoria || "Sin categoría"}</p>
+<p class="card-description">${r.descripcion || ""}</p>
+<p class="card-location"><i class="fas fa-map-marker-alt"></i> ${
+    r.ubicacion || ""
+  }</p>
+<div class="card-footer">
+<div class="likes-counter">
+<i class="fas fa-heart"></i>
+<span>${r.likes ? r.likes.length : 0} likes</span>
+</div>
+<button class="btn-like" data-id="${r._id}">
+${
+  r.likes?.includes(getUserId())
+    ? '<i class="fas fa-heart"></i> Me gusta'
+    : '<i class="far fa-heart"></i> Me gusta'
 }
+</button>
+</div>
+</div>
+`;
 
-function limpiarResultadosBackend() {
-  const cardsExtras = resultadosContainer.querySelectorAll(
-    ".restaurant-card[data-backend='true']"
-  );
-  cardsExtras.forEach((c) => c.remove());
-}
-
-function mostrarMensaje(texto, esError = false) {
-  searchMessage.textContent = texto;
-  if (esError) {
-    searchMessage.classList.add("error");
-  } else {
-    searchMessage.classList.remove("error");
-  }
-}
-
-const btnAdmin = document.querySelector("#btnAdmin");
-const modalAdmin = document.getElementById("modalAdminLogin");
-const closeAdmin = modalAdmin.querySelector(".close-x");
-const formAdmin = document.getElementById("formAdminLogin");
-const errorAdminMsg = document.getElementById("errorAdminMsg");
-
-(function () {
-  let modalLogin = document.querySelector(".modal-login");
-  if (!modalLogin) {
-    modalLogin = document.createElement("div");
-    modalLogin.className = "modal-login";
-    modalLogin.innerHTML = `
-      <div class="modal-card" role="dialog" aria-modal="true">
-        <span class="close-x" title="Cerrar">&times;</span>
-        <h2>Inicio de sesión</h2>
-        <form id="formLogin">
-          <label for="username">Usuario</label>
-          <input id="username" name="username" type="text" required placeholder="Usuario">
-          
-          <label for="password">Contraseña</label>
-          <input id="password" name="password" type="password" required placeholder="Contraseña">
-
-          <p id="errorLoginMsg" class="error-modal-msg" style="display:none;"></p>
-
-          <button type="submit">Ingresar</button>
-        </form>
-      </div>
-    `;
-    document.body.appendChild(modalLogin);
-  }
-
-  if (!document.getElementById("estilos-modal-login")) {
-    const style = document.createElement("style");
-    style.id = "estilos-modal-login";
-    style.textContent = `
-      .modal-login {
-        display:none; position:fixed; z-index:9999; left:0; top:0; width:100%; height:100%;
-        background:rgba(0,0,0,0.5); align-items:center; justify-content:center;
+ 
+  const btnLike = card.querySelector(".btn-like");
+  if (btnLike) {
+    btnLike.addEventListener("click", async () => {
+      try {
+        const token = getAuthToken();
+        const res = await fetch(`${REST_API}/${r._id}/like`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+        if (res.ok) {
+          await cargarRestaurantesBackend(); 
+        }
+      } catch (err) {
+        console.error("Error al dar like:", err);
       }
-      .modal-login .modal-card {
-        background:pink; border-radius:10px; max-width:360px; width:90%;
-        padding:20px; box-shadow:0 6px 30px rgba(0,0,0,0.3);
-      }
-      .modal-login .close-x { float:right; font-size:22px; cursor:pointer; }
-      .modal-login h2 { margin-top:0; text-align:center; }
-      .modal-login input { width:100%; margin-top:6px; border-radius:6px; border:1px solid #ccc; padding:8px; }
-      .modal-login button[type="submit"] {
-        margin-top:12px; background:#764ba2; color:white; border:none;
-        border-radius:6px; padding:10px 16px; cursor:pointer; width:100%;
-      }
-      .error-modal-msg { color:#b30000; font-weight:600; margin:10px 0 0; text-align:center; }
-    `;
-    document.head.appendChild(style);
-  }
-
-  const btnLogin =
-    document.querySelector("#btnLogin") || document.querySelector(".btn-admin");
-  const formLogin = document.getElementById("formLogin");
-  const closeX = modalLogin.querySelector(".close-x");
-  const errorLoginMsg = modalLogin.querySelector("#errorLoginMsg");
-
-  if (btnLogin) {
-    btnLogin.addEventListener("click", (e) => {
-      e.preventDefault();
-      modalLogin.style.display = "flex";
-      document.getElementById("correo").focus();
-      errorLoginMsg.style.display = "none";
     });
   }
 
-  closeX.addEventListener("click", () => (modalLogin.style.display = "none"));
-  modalLogin.addEventListener("click", (ev) => {
-    if (ev.target === modalLogin) modalLogin.style.display = "none";
-  });
-  document.addEventListener("keydown", (ev) => {
-    if (ev.key === "Escape") modalLogin.style.display = "none";
-  });
+  return card;
+}
 
-  formLogin.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    errorLoginMsg.style.display = "none";
 
-    const username = document.getElementById("correo").value.trim();
-    const password = document.getElementById("contrasenia").value.trim();
-
-    if (!username || !password) {
-      errorLoginMsg.textContent = "Por favor completa todos los campos.";
-      errorLoginMsg.style.display = "block";
-      return;
-    }
-
-    try {
-      const res = await fetch("http://localhost:4000/api/v1/admin", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ correo, contrasenia }),
-      });
-
-      if (!res.ok) {
-        throw new Error("Credenciales incorrectas");
-      }
-
-      window.location.href = "./admin.html";
-    } catch (err) {
-      console.error(err);
-      errorLoginMsg.textContent =
-        "No se pudo iniciar sesión. Verifica tus credenciales o el servidor.";
-      errorLoginMsg.style.display = "block";
-    }
-  });
-})();
+function getUserId() {
+  const authData = sessionStorage.getItem("authData");
+  if (!authData) return null;
+  try {
+    const data = JSON.parse(authData);
+    return data.id;
+  } catch (e) {
+    return null;
+  }
+}

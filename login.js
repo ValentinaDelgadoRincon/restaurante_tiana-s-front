@@ -1,5 +1,4 @@
 (function () {
- 
   const loginForm = document.getElementById("loginForm");
   const errorLoginMsg = document.getElementById("errorLoginUserMsg");
 
@@ -8,10 +7,10 @@
       e.preventDefault();
       errorLoginMsg.style.display = "none";
 
-      const username = document.getElementById("usernameUser").value.trim();
-      const password = document.getElementById("passwordUser").value.trim();
+      const correo = document.getElementById("usernameUser").value.trim();
+      const contrasenia = document.getElementById("passwordUser").value.trim();
 
-      if (!username || !password) {
+      if (!correo || !contrasenia) {
         errorLoginMsg.textContent = "Por favor completa todos los campos.";
         errorLoginMsg.style.display = "block";
         return;
@@ -21,7 +20,7 @@
         const res = await fetch("http://localhost:4000/api/v1/usuarios/login", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ username, password }),
+          body: JSON.stringify({ correo, contrasenia }),
         });
 
         let data;
@@ -30,9 +29,11 @@
         } catch {
           throw new Error("Respuesta del servidor no válida.");
         }
+        console.log(data);
 
-        if (res.ok && data.success) {
-          window.location.href = "./index.html";
+        if (res.ok) {
+          sessionStorage.setItem("authData", JSON.stringify(data));
+          window.location.href = "./usuario.html";
         } else {
           errorLoginMsg.textContent =
             data.message || "Usuario o contraseña incorrectos.";
@@ -53,7 +54,6 @@
     registerForm.addEventListener("submit", async (e) => {
       e.preventDefault();
 
-     
       const nombre = registerForm
         .querySelector('input[placeholder="Nombre"]')
         .value.trim();
@@ -61,14 +61,13 @@
         .querySelector('input[placeholder="Apellido"]')
         .value.trim();
       const rol = registerForm.querySelector("select").value;
-      const email = registerForm
+      const correo = registerForm
         .querySelector('input[type="email"]')
         .value.trim();
-      const password = registerForm
+      const contrasenia = registerForm
         .querySelector('input[type="password"]')
         .value.trim();
 
-     
       let msg = registerForm.querySelector(".form-msg");
       if (!msg) {
         msg = document.createElement("p");
@@ -78,21 +77,18 @@
         registerForm.appendChild(msg);
       }
 
-      
       msg.style.display = "none";
       msg.textContent = "";
 
-      
-      if (!nombre || !apellido || !rol || !email || !password) {
+      if (!nombre || !apellido || !rol || !correo || !contrasenia) {
         msg.textContent = "Por favor completa todos los campos.";
         msg.style.color = "red";
         msg.style.display = "block";
         return;
       }
 
-      
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email)) {
+      if (!emailRegex.test(correo)) {
         msg.textContent = "Por favor ingresa un correo válido.";
         msg.style.color = "red";
         msg.style.display = "block";
@@ -100,11 +96,20 @@
       }
 
       try {
-        const res = await fetch("http://localhost:4000/api/v1/usuarios/registro", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ nombre, apellido, rol, email, password }),
-        });
+        const res = await fetch(
+          "http://localhost:4000/api/v1/usuarios/registro",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              nombre,
+              apellido,
+              rol,
+              correo,
+              contrasenia,
+            }),
+          }
+        );
 
         let data;
         try {
@@ -113,12 +118,11 @@
           throw new Error("Respuesta del servidor no válida.");
         }
 
-        if (res.ok && data.success) {
+        if (res.ok) {
           msg.textContent = "Registro exitoso. Ahora puedes iniciar sesión.";
           msg.style.color = "green";
           msg.style.display = "block";
 
-          
           registerForm.reset();
           setTimeout(() => {
             document
@@ -127,7 +131,8 @@
             msg.style.display = "none";
           }, 2000);
         } else {
-          msg.textContent = data.message || "No se pudo registrar el usuario.";
+          msg.textContent =
+            data.message.errors[0].msg || "No se pudo registrar el usuario.";
           msg.style.color = "red";
           msg.style.display = "block";
         }
@@ -141,7 +146,6 @@
     });
   }
 
-  
   const sign_in_btn = document.querySelector("#sign-in-btn");
   const sign_up_btn = document.querySelector("#sign-up-btn");
   const container = document.querySelector(".container");
