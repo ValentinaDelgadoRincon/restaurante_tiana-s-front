@@ -1222,3 +1222,9 @@ body {
     }
 }
 
+.error-msg {
+    color: red;
+    font-weight: 600;
+    margin-top: 6px;
+    text-align: center;
+}
