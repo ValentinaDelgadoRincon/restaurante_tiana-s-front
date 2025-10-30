@@ -35,15 +35,44 @@ let restaurants = [
 
 let currentId = null;
 
+async function fetchAuth(url, options = {}) {
+  const token = localStorage.getItem("token");
+  const headers = {
+    "Content-Type": "application/json",
+    ...options.headers,
+  };
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+
+  const res = await fetch(url, { ...options, headers });
+  if (res.status === 401) {
+    alert("Tu sesión ha expirado. Por favor inicia sesión nuevamente.");
+    localStorage.removeItem("token");
+    window.location.href = "./login.html";
+    throw new Error("Token inválido o expirado");
+  }
+  return res;
+}
+
+(function verificarTokenAdmin() {
+  if (!document.getElementById("tableBody")) return;
+  const token = localStorage.getItem("token");
+  if (!token) {
+    alert("Debes iniciar sesión para acceder al panel de administración.");
+    window.location.href = "./login.html";
+  }
+})();
+
 async function loadTable() {
   const tbody = document.getElementById("tableBody");
+  if (!tbody) return;
   tbody.innerHTML = "";
 
   try {
-    const res = await fetch(API);
+    const res = await fetchAuth(API);
     if (!res.ok) throw new Error("No hay respuesta del backend");
     const backendData = await res.json();
-    if (backendData.length) restaurants = backendData;
+    if (Array.isArray(backendData) && backendData.length)
+      restaurants = backendData;
   } catch (err) {
     console.warn("Backend no disponible, usando datos locales.", err);
   }
@@ -53,40 +82,49 @@ async function loadTable() {
     return;
   }
 
+  tbody.innerHTML = "";
   restaurants.forEach((r) => {
-    const categoryClass = r.category.toLowerCase().replace(" ", "-");
+    const categoryClass = (r.category || "").toLowerCase().replace(/\s+/g, "-");
+    const ratingVal = Number(r.rating) || 0;
     const stars =
-      "★".repeat(Math.floor(r.rating)) + "☆".repeat(5 - Math.floor(r.rating));
+      "★".repeat(Math.floor(ratingVal)) + "☆".repeat(5 - Math.floor(ratingVal));
 
     tbody.innerHTML += `
-        <tr>
-            <td><strong>${r.name}</strong></td>
-            <td><span class="badge badge-${categoryClass}">${r.category}</span></td>
-            <td><div class="rating-display">${stars} ${r.rating}</div></td>
-            <td>${r.price}</td>
-            <td>${r.location}</td>
-            <td>
-                <div class="action-buttons">
-                    <button class="btn-icon btn-view" onclick="viewRestaurant('${r._id}')" title="Ver detalles"><i class="fas fa-eye"></i></button>
-                    <button class="btn-icon btn-edit" onclick="editRestaurant('${r._id}')" title="Editar"><i class="fas fa-edit"></i></button>
-                    <button class="btn-icon btn-delete" onclick="deleteRestaurant('${r._id}')" title="Eliminar"><i class="fas fa-trash"></i></button>
-                </div>
-            </td>
-        </tr>`;
+      <tr>
+        <td><strong>${escapeHtml(r.name || "")}</strong></td>
+        <td><span class="badge badge-${escapeHtml(categoryClass)}">${escapeHtml(
+      r.category || ""
+    )}</span></td>
+        <td><div class="rating-display">${stars} ${ratingVal}</div></td>
+        <td>${escapeHtml(r.price || "")}</td>
+        <td>${escapeHtml(r.location || "")}</td>
+        <td>
+          <div class="action-buttons">
+            <button class="btn-icon btn-view" onclick="viewRestaurant('${r._id
+      }')" title="Ver detalles"><i class="fas fa-eye"></i></button>
+            <button class="btn-icon btn-edit" onclick="editRestaurant('${r._id
+      }')" title="Editar"><i class="fas fa-edit"></i></button>
+            <button class="btn-icon btn-delete" onclick="deleteRestaurant('${r._id
+      }')" title="Eliminar"><i class="fas fa-trash"></i></button>
+          </div>
+        </td>
+      </tr>
+    `;
   });
 }
 
 function openModal(restaurant = null) {
   const modal = document.getElementById("restaurantModal");
   const form = document.getElementById("restaurantForm");
+  if (!modal || !form) return;
 
   if (restaurant) {
     document.getElementById("modalTitle").textContent = "Editar Restaurante";
-    document.getElementById("name").value = restaurant.name;
-    document.getElementById("category").value = restaurant.category;
+    document.getElementById("name").value = restaurant.name || "";
+    document.getElementById("category").value = restaurant.category || "";
     document.getElementById("description").value = restaurant.description || "";
-    document.getElementById("rating").value = restaurant.rating;
-    document.getElementById("price").value = restaurant.price;
+    document.getElementById("rating").value = restaurant.rating || 0;
+    document.getElementById("price").value = restaurant.price || "";
     document.getElementById("location").value = restaurant.location || "";
     document.getElementById("delivery").value = restaurant.delivery || "";
     currentId = restaurant._id;
@@ -100,30 +138,46 @@ function openModal(restaurant = null) {
 }
 
 function closeModal() {
-  document.getElementById("restaurantModal").classList.remove("active");
-  document.getElementById("restaurantForm").reset();
+  const modal = document.getElementById("restaurantModal");
+  const form = document.getElementById("restaurantForm");
+  if (modal) modal.classList.remove("active");
+  if (form) form.reset();
   currentId = null;
 }
 
-document
-  .getElementById("restaurantForm")
-  .addEventListener("submit", async function (e) {
+function escapeHtml(s) {
+  if (!s && s !== 0) return "";
+  return String(s).replace(
+    /[&<>"']/g,
+    (m) =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[
+      m
+    ])
+  );
+}
+
+(function initFormListener() {
+  const form = document.getElementById("restaurantForm");
+  if (!form) return;
+
+  form.addEventListener("submit", async function (e) {
     e.preventDefault();
+
     const formData = {
       name: document.getElementById("name").value,
       category: document.getElementById("category").value,
       description: document.getElementById("description").value,
-      rating: parseFloat(document.getElementById("rating").value),
+      rating: parseFloat(document.getElementById("rating").value) || 0,
       price: document.getElementById("price").value,
       location: document.getElementById("location").value,
-      delivery: parseInt(document.getElementById("delivery").value) || 30,
+      delivery: parseInt(document.getElementById("delivery").value, 10) || 30,
     };
 
     try {
+      const token = localStorage.getItem("token");
       if (currentId) {
-        await fetch(`${API}/${currentId}`, {
+        await fetchAuth(`${API}/${currentId}`, {
           method: "PUT",
-          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(formData),
         });
 
@@ -136,14 +190,16 @@ document
         formData._id = newId;
 
         try {
-          const res = await fetch(API, {
+          const res = await fetchAuth(API, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
             body: JSON.stringify(formData),
           });
-          const created = await res.json();
-          formData._id = created._id || newId;
-        } catch {
+
+          if (res.ok) {
+            const created = await res.json();
+            formData._id = created._id || newId;
+          }
+        } catch (err) {
           console.warn("No se pudo guardar en backend, se guarda localmente.");
         }
 
@@ -152,20 +208,22 @@ document
       }
 
       closeModal();
-      loadTable();
+      await loadTable();
     } catch (err) {
       console.error(err);
       showNotification("Error al guardar restaurante", "error");
     }
   });
+})();
 
 async function editRestaurant(id) {
   let restaurant = restaurants.find((r) => r._id === id);
   if (!restaurant) {
     try {
-      const res = await fetch(`${API}/${id}`);
+      const res = await fetchAuth(`${API}/${id}`);
+      if (!res.ok) throw new Error("No encontrado");
       restaurant = await res.json();
-    } catch {
+    } catch (err) {
       showNotification("No se encontró restaurante", "error");
       return;
     }
@@ -177,52 +235,55 @@ async function deleteRestaurant(id) {
   if (!confirm("¿Seguro de eliminar este restaurante?")) return;
 
   try {
-    await fetch(`${API}/${id}`, { method: "DELETE" });
-  } catch {
+    await fetchAuth(`${API}/${id}`, { method: "DELETE" });
+  } catch (err) {
     console.warn("No se pudo eliminar en backend, se elimina localmente.");
   }
 
   restaurants = restaurants.filter((r) => r._id !== id);
   showNotification("✓ Restaurante eliminado", "success");
-  loadTable();
+  await loadTable();
 }
 
 async function viewRestaurant(id) {
   let r = restaurants.find((r) => r._id === id);
   if (!r) {
     try {
-      const res = await fetch(`${API}/${id}`);
+      const res = await fetchAuth(`${API}/${id}`);
+      if (!res.ok) throw new Error("No encontrado");
       r = await res.json();
-    } catch {
+    } catch (err) {
       showNotification(" Error al cargar detalles", "error");
       return;
     }
   }
+
   alert(
-    `Detalles del Restaurante:\n\nNombre: ${r.name}\nCategoría: ${
-      r.category
-    }\nCalificación: ${r.rating} \nPrecio: ${r.price}\nUbicación: ${
-      r.location
-    }\nEntrega: ${r.delivery} min\nDescripción: ${
-      r.description || "Sin descripción"
+    `Detalles del Restaurante:\n\nNombre: ${r.name}\nCategoría: ${r.category
+    }\nCalificación: ${r.rating} \nPrecio: ${r.price}\nUbicación: ${r.location
+    }\nEntrega: ${r.delivery} min\nDescripción: ${r.description || "Sin descripción"
     }`
   );
 }
 
 function filterTable() {
-  const search = document.getElementById("searchInput").value.toLowerCase();
-  const cat = document.getElementById("categoryFilter").value;
-  const rate = parseFloat(document.getElementById("ratingFilter").value) || 0;
+  const search = (
+    document.getElementById("searchInput")?.value || ""
+  ).toLowerCase();
+  const cat = document.getElementById("categoryFilter")?.value;
+  const rate = parseFloat(document.getElementById("ratingFilter")?.value) || 0;
 
   document.querySelectorAll("#tableBody tr").forEach((r) => {
-    const name = r.cells[0]?.textContent.toLowerCase() || "";
-    const category = r.querySelector(".badge")?.textContent.toLowerCase() || "";
+    const name = (r.cells[0]?.textContent || "").toLowerCase();
+    const category = (
+      r.querySelector(".badge")?.textContent || ""
+    ).toLowerCase();
     const rating =
       parseFloat(r.cells[2]?.textContent.match(/[\d.]+/)?.[0]) || 0;
     r.style.display =
       name.includes(search) &&
-      (!cat || category === cat) &&
-      (!rate || rating >= rate)
+        (!cat || category === cat) &&
+        (!rate || rating >= rate)
         ? ""
         : "none";
   });
@@ -230,9 +291,8 @@ function filterTable() {
 
 function showNotification(msg, type = "success") {
   const n = document.createElement("div");
-  n.style.cssText = `position:fixed;top:100px;right:20px;background:${
-    type === "success" ? "#4caf50" : "#f44336"
-  };color:white;padding:1rem 1.5rem;border-radius:10px;box-shadow:0 4px 15px rgba(0,0,0,0.3);z-index:10000;font-weight:600;animation:slideIn 0.3s ease;`;
+  n.style.cssText = `position:fixed;top:100px;right:20px;background:${type === "success" ? "#4caf50" : "#f44336"
+    };color:white;padding:1rem 1.5rem;border-radius:10px;box-shadow:0 4px 15px rgba(0,0,0,0.3);z-index:10000;font-weight:600;animation:slideIn 0.3s ease;`;
   n.textContent = msg;
   document.body.appendChild(n);
   setTimeout(() => {
@@ -245,4 +305,4 @@ window.onclick = function (e) {
   if (e.target === document.getElementById("restaurantModal")) closeModal();
 };
 
-loadTable();
+if (document.getElementById("tableBody")) loadTable();
