@@ -477,6 +477,125 @@ function mostrarMensaje(texto, esError = false) {
   }
 }
 
+const btnAdmin = document.querySelector("#btnAdmin");
+const modalAdmin = document.getElementById("modalAdminLogin");
+const closeAdmin = modalAdmin.querySelector(".close-x");
+const formAdmin = document.getElementById("formAdminLogin");
+const errorAdminMsg = document.getElementById("errorAdminMsg");
+
+(function () {
+  
+  let modalLogin = document.querySelector(".modal-login");
+  if (!modalLogin) {
+    modalLogin = document.createElement("div");
+    modalLogin.className = "modal-login";
+    modalLogin.innerHTML = `
+      <div class="modal-card" role="dialog" aria-modal="true">
+        <span class="close-x" title="Cerrar">&times;</span>
+        <h2>Inicio de sesión</h2>
+        <form id="formLogin">
+          <label for="username">Usuario</label>
+          <input id="username" name="username" type="text" required placeholder="Usuario">
+          
+          <label for="password">Contraseña</label>
+          <input id="password" name="password" type="password" required placeholder="Contraseña">
+
+          <p id="errorLoginMsg" class="error-modal-msg" style="display:none;"></p>
+
+          <button type="submit">Ingresar</button>
+        </form>
+      </div>
+    `;
+    document.body.appendChild(modalLogin);
+  }
+
+  
+  if (!document.getElementById("estilos-modal-login")) {
+    const style = document.createElement("style");
+    style.id = "estilos-modal-login";
+    style.textContent = `
+      .modal-login {
+        display:none; position:fixed; z-index:9999; left:0; top:0; width:100%; height:100%;
+        background:rgba(0,0,0,0.5); align-items:center; justify-content:center;
+      }
+      .modal-login .modal-card {
+        background:pink; border-radius:10px; max-width:360px; width:90%;
+        padding:20px; box-shadow:0 6px 30px rgba(0,0,0,0.3);
+      }
+      .modal-login .close-x { float:right; font-size:22px; cursor:pointer; }
+      .modal-login h2 { margin-top:0; text-align:center; }
+      .modal-login input { width:100%; margin-top:6px; border-radius:6px; border:1px solid #ccc; padding:8px; }
+      .modal-login button[type="submit"] {
+        margin-top:12px; background:#764ba2; color:white; border:none;
+        border-radius:6px; padding:10px 16px; cursor:pointer; width:100%;
+      }
+      .error-modal-msg { color:#b30000; font-weight:600; margin:10px 0 0; text-align:center; }
+    `;
+    document.head.appendChild(style);
+  }
+
+ 
+  const btnLogin =
+    document.querySelector("#btnLogin") || document.querySelector(".btn-admin");
+  const formLogin = document.getElementById("formLogin");
+  const closeX = modalLogin.querySelector(".close-x");
+  const errorLoginMsg = modalLogin.querySelector("#errorLoginMsg");
+
+  
+  if (btnLogin) {
+    btnLogin.addEventListener("click", (e) => {
+      e.preventDefault();
+      modalLogin.style.display = "flex";
+      document.getElementById("username").focus();
+      errorLoginMsg.style.display = "none";
+    });
+  }
+
+  
+  closeX.addEventListener("click", () => (modalLogin.style.display = "none"));
+  modalLogin.addEventListener("click", (ev) => {
+    if (ev.target === modalLogin) modalLogin.style.display = "none";
+  });
+  document.addEventListener("keydown", (ev) => {
+    if (ev.key === "Escape") modalLogin.style.display = "none";
+  });
+
+ 
+  formLogin.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    errorLoginMsg.style.display = "none";
+
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value.trim();
+
+    if (!username || !password) {
+      errorLoginMsg.textContent = "Por favor completa todos los campos.";
+      errorLoginMsg.style.display = "block";
+      return;
+    }
+
+    try {
+      const res = await fetch("http://localhost:4000/admin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Credenciales incorrectas");
+      }
+
+      
+      window.location.href = "./admin.html";
+    } catch (err) {
+      console.error(err);
+      errorLoginMsg.textContent =
+        "No se pudo iniciar sesión. Verifica tus credenciales o el servidor.";
+      errorLoginMsg.style.display = "block";
+    }
+  });
+})();
+
 
 const sign_in_btn = document.querySelector("#sign-in-btn");
 const sign_up_btn = document.querySelector("#sign-up-btn");
@@ -497,3 +616,4 @@ filterBtns.forEach((btn) => {
     btn.classList.add("active");
   });
 });
+
