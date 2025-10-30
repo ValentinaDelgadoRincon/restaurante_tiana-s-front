@@ -101,7 +101,50 @@ form.sign-in-form {
     color: #aaa;
     font-weight: 500;
 }
+.input-field {
+    display: flex;
+    align-items: center;
+    border: 1px solid #ccc;
+    padding: 0.6rem 1rem;
+    border-radius: 30px;
+    margin: 10px 0;
+    background: #f0f0f0;
+}
 
+.input-field i {
+    color: #acacac;
+    font-size: 1.2rem;
+    margin-right: 10px;
+}
+
+.input-field input,
+.input-field select {
+    border: none;
+    outline: none;
+    background: none;
+    width: 100%;
+    font-size: 1rem;
+    color: #333;
+    font-family: "Poppins", sans-serif;
+}
+
+.input-field select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    cursor: pointer;
+}
+
+
+.input-field select::-ms-expand {
+    display: none;
+}
+
+
+.input-field:hover {
+    background: #e8e8e8;
+    transition: 0.3s;
+}
 .btn {
     width: 150px;
     background-color: #fd59c6;

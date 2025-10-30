@@ -265,7 +265,7 @@
       return;
     }
 
-    const payload = { nombre, calificacion, comentario };
+    const payload = { nombre, calificacion, comentario, platoId, restauranteId, usuarioId };
 
     try {
       const res = await fetch(API, {
@@ -486,7 +486,7 @@ const errorAdminMsg = document.getElementById("errorAdminMsg");
     btnLogin.addEventListener("click", (e) => {
       e.preventDefault();
       modalLogin.style.display = "flex";
-      document.getElementById("username").focus();
+      document.getElementById("correo").focus();
       errorLoginMsg.style.display = "none";
     });
   }
@@ -503,8 +503,8 @@ const errorAdminMsg = document.getElementById("errorAdminMsg");
     e.preventDefault();
     errorLoginMsg.style.display = "none";
 
-    const username = document.getElementById("username").value.trim();
-    const password = document.getElementById("password").value.trim();
+    const username = document.getElementById("correo").value.trim();
+    const password = document.getElementById("contrasenia").value.trim();
 
     if (!username || !password) {
       errorLoginMsg.textContent = "Por favor completa todos los campos.";
@@ -516,7 +516,7 @@ const errorAdminMsg = document.getElementById("errorAdminMsg");
       const res = await fetch("http://localhost:4000/api/v1/admin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ correo, contrasenia }),
       });
 
       if (!res.ok) {

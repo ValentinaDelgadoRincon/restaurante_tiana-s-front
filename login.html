@@ -17,7 +17,7 @@
               <input
                 type="text"
                 id="usernameUser"
-                placeholder="Nombre Usuario"
+                placeholder="Gmail"
                 required
               />
             </div>
@@ -40,18 +40,36 @@
 
           <form action="#" class="sign-up-form">
             <h2 class="title">Registrarse</h2>
+
             <div class="input-field">
               <i class="fas fa-user"></i>
-              <input type="text" placeholder="Nombre Usuario" />
+              <input type="text" placeholder="Nombre" />
             </div>
+
+            <div class="input-field">
+              <i class="fas fa-user-tag"></i>
+              <input type="text" placeholder="Apellido" />
+            </div>
+
+            <div class="input-field">
+              <i class="fas fa-user-shield"></i>
+              <select>
+                <option value="" disabled selected>Seleccionar Rol</option>
+                <option value="admin">Administrador</option>
+                <option value="usuario">Usuario</option>
+              </select>
+            </div>
+
             <div class="input-field">
               <i class="fas fa-envelope"></i>
               <input type="email" placeholder="Gmail" />
             </div>
+
             <div class="input-field">
               <i class="fas fa-lock"></i>
               <input type="password" placeholder="Contraseña" />
             </div>
+
             <input type="submit" class="btn" value="Registrarse" />
           </form>
         </div>
