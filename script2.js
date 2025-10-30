@@ -160,131 +160,83 @@
     }
   }
 
-  
-  window.addEventListener("DOMContentLoaded", () => {
-    const reseñasLocales = document.querySelectorAll(
-      ".review-card:not([data-id])"
-    );
+ 
 
-    reseñasLocales.forEach((card, index) => {
-      const id = `local_${index}`;
-      card.dataset.id = id;
+  function inicializarVotos() {
+    document.querySelectorAll(".review-card").forEach((card, index) => {
+     
+      if (card.querySelector(".vote-buttons")) return;
+
+  
+      const voteContainer = document.createElement("div");
+      voteContainer.classList.add("vote-buttons");
+      voteContainer.style.display = "flex";
+      voteContainer.style.gap = "10px";
+      voteContainer.style.marginTop = "10px";
+
+      const btnLike = document.createElement("button");
+      btnLike.innerHTML = '<i class="fas fa-thumbs-up"></i> Me gusta';
+      btnLike.classList.add("btn-like");
+
+      const btnDislike = document.createElement("button");
+      btnDislike.innerHTML = '<i class="fas fa-thumbs-down"></i> No me gusta';
+      btnDislike.classList.add("btn-dislike");
+
+      
+      voteContainer.appendChild(btnLike);
+      voteContainer.appendChild(btnDislike);
+      card.appendChild(voteContainer);
 
      
-      if (!card.querySelector(".review-actions")) {
-        const actions = document.createElement("div");
-        actions.className = "review-actions";
-        actions.innerHTML = `
-        <button class="btn-like" data-id="${id}" title="Me gusta">👍 <span>0</span></button>
-        <button class="btn-dislike" data-id="${id}" title="No me gusta">👎 <span>0</span></button>
-      `;
-        card.appendChild(actions);
-      }
+      const reviewId = `review_${index}`;
+
+      
+      //const votoPrevio = localStorage.getItem(reviewId);
+      //if (votoPrevio) {
+       // bloquearVoto(btnLike, btnDislike, votoPrevio);
+        //card.dataset.voted = "true";
+      //}
+
+      
+      btnLike.addEventListener("click", () => {
+        manejarVoto(reviewId, "like", btnLike, btnDislike, card);
+      });
+
+      btnDislike.addEventListener("click", () => {
+        manejarVoto(reviewId, "dislike", btnLike, btnDislike, card);
+      });
     });
+  }
+
+  function manejarVoto(reviewId, tipo, btnLike, btnDislike, card) {
+    if (card.dataset.voted === "true") return;
+
+    if (tipo === "like") {
+      btnLike.classList.add("active");
+      btnDislike.classList.add("disabled");
+    } else {
+      btnDislike.classList.add("active");
+      btnLike.classList.add("disabled");
+    }
 
     
-    if (typeof activarBotonesReaccion === "function") {
-      activarBotonesReaccion();
-    }
-  });
-
-  function renderResenas(items) {
-    contenedorResenas.innerHTML =
-      '<h2 class="section-title">💬 Reseñas de Clientes</h2>';
-
-    if (!items.length) {
-      mostrarMensajeResenas("No hay reseñas todavía.");
-      return;
-    }
-
-    items.forEach((r) => {
-      const id = r.id || r._id || crypto.randomUUID(); 
-      const likes = r.likes || 0;
-      const dislikes = r.dislikes || 0;
-
-      const card = document.createElement("div");
-      card.className = "review-card";
-      card.dataset.id = id;
-
-      card.innerHTML = `
-      <div class="review-header">
-        <div class="reviewer-info">
-          <div class="reviewer-avatar">${
-            r.nombre?.[0]?.toUpperCase() || "U"
-          }</div>
-          <div>
-            <div class="reviewer-name">${escapeHtml(
-              r.nombre || "Anónimo"
-            )}</div>
-            <div class="review-date">Reciente</div>
-          </div>
-        </div>
-        <div class="review-rating">${"⭐".repeat(r.calificacion || 0)}</div>
-      </div>
-      <p class="review-text">${escapeHtml(r.comentario || "")}</p>
-      <div class="review-actions">
-        <button class="btn-like" data-id="${id}" title="Me gusta">👍 <span>${likes}</span></button>
-        <button class="btn-dislike" data-id="${id}" title="No me gusta">👎 <span>${dislikes}</span></button>
-      </div>
-    `;
-
-      contenedorResenas.appendChild(card);
-    });
-
-    activarBotonesReaccion();
+    localStorage.setItem(reviewId, tipo);
+    card.dataset.voted = "true";
   }
-  function activarBotonesReaccion() {
-    const likeBtns = contenedorResenas.querySelectorAll(".btn-like");
-    const dislikeBtns = contenedorResenas.querySelectorAll(".btn-dislike");
 
-    likeBtns.forEach((btn) => {
-      btn.addEventListener("click", async () => {
-        const id = btn.dataset.id;
-        const key = `reseña_voto_${id}`;
-        if (localStorage.getItem(key))
-          return alert("Ya votaste esta reseña 👍");
-
-        const countEl = btn.querySelector("span");
-        let likes = parseInt(countEl.textContent) + 1;
-        countEl.textContent = likes;
-        localStorage.setItem(key, "like");
-
-        try {
-          await fetch(`${API}/${id}`, {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ likes }),
-          });
-        } catch (err) {
-          console.error("Error actualizando like:", err);
-        }
-      });
-    });
-
-    dislikeBtns.forEach((btn) => {
-      btn.addEventListener("click", async () => {
-        const id = btn.dataset.id;
-        const key = `reseña_voto_${id}`;
-        if (localStorage.getItem(key))
-          return alert("Ya votaste esta reseña 👎");
-
-        const countEl = btn.querySelector("span");
-        let dislikes = parseInt(countEl.textContent) + 1;
-        countEl.textContent = dislikes;
-        localStorage.setItem(key, "dislike");
-
-        try {
-          await fetch(`${API}/${id}`, {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ dislikes }),
-          });
-        } catch (err) {
-          console.error("Error actualizando dislike:", err);
-        }
-      });
-    });
+ 
+  function bloquearVoto(btnLike, btnDislike, tipo) {
+    if (tipo === "like") {
+      btnLike.classList.add("active");
+      btnDislike.classList.add("disabled");
+    } else {
+      btnDislike.classList.add("active");
+      btnLike.classList.add("disabled");
+    }
   }
+
+  
+  document.addEventListener("DOMContentLoaded", inicializarVotos);
 
   function mostrarMensajeResenas(texto, esError = false) {
     const msg = document.createElement("p");

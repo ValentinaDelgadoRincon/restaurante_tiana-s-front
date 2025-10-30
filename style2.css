@@ -933,4 +933,18 @@ body {
       transform: scale(1.05);
   }
 
- 
+ .btn-like.disabled,
+ .btn-dislike.disabled {
+     opacity: 0.5;
+     cursor: not-allowed;
+ }
+
+ .btn-like.active {
+     color: #28a745;
+     transform: scale(1.1);
+ }
+
+ .btn-dislike.active {
+     color: #dc3545;
+     transform: scale(1.1);
+ }
