@@ -5,6 +5,7 @@
     padding: 0;
     box-sizing: border-box;
 }
+
 html {
     scroll-behavior: smooth;
 }
@@ -171,6 +172,7 @@ body {
     font-size: 4rem;
     color: white;
 }
+
 .card-image img {
     width: 120px;
     height: 120px;
@@ -495,13 +497,13 @@ body {
     cursor: pointer;
     margin: 6px 0 10px;
     justify-content: center;
-  }
-  
-  .rating-stars i:hover {
+}
+
+.rating-stars i:hover {
     transform: scale(1.1);
     transition: transform 0.15s ease;
-  }
-  
+}
+
 
 .btn-view {
     background: palevioletred;
@@ -881,70 +883,71 @@ body {
     color: #333;
     font-weight: 500;
     margin-top: 10px;
-  }
-  .search-message.error {
+}
+
+.search-message.error {
     color: red;
-  }
-  
-  .review-actions {
-      display: flex;
-      gap: 10px;
-      margin-top: 8px;
-  }
+}
 
-  .btn-like,
-  .btn-dislike {
-      background: #eee;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      padding: 6px 12px;
-      font-size: 16px;
-      transition: background 0.2s;
-  }
+.review-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 8px;
+}
 
-  .btn-like:hover {
-      background: #c0f2c0;
-  }
+.btn-like,
+.btn-dislike {
+    background: #eee;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    padding: 6px 12px;
+    font-size: 16px;
+    transition: background 0.2s;
+}
 
-  .btn-dislike:hover {
-      background: #f2c0c0;
-  }
+.btn-like:hover {
+    background: #c0f2c0;
+}
 
-  
-  .btn-admin {
-      position: fixed;
-      bottom: 25px;
-      right: 25px;
-      background-color: #764ba2;
-      color: white;
-      border: none;
-      border-radius: 25px;
-      padding: 12px 22px;
-      cursor: pointer;
-      font-weight: 500;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-      transition: all 0.3s ease;
-      z-index: 1000;
-  }
+.btn-dislike:hover {
+    background: #f2c0c0;
+}
 
-  .btn-admin:hover {
-      background-color: #5b3c85;
-      transform: scale(1.05);
-  }
 
- .btn-like.disabled,
- .btn-dislike.disabled {
-     opacity: 0.5;
-     cursor: not-allowed;
- }
+.btn-admin {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    background-color: #764ba2;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    padding: 12px 22px;
+    cursor: pointer;
+    font-weight: 500;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
 
- .btn-like.active {
-     color: #28a745;
-     transform: scale(1.1);
- }
+.btn-admin:hover {
+    background-color: #5b3c85;
+    transform: scale(1.05);
+}
 
- .btn-dislike.active {
-     color: #dc3545;
-     transform: scale(1.1);
- }
+.btn-like.disabled,
+.btn-dislike.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn-like.active {
+    color: #28a745;
+    transform: scale(1.1);
+}
+
+.btn-dislike.active {
+    color: #dc3545;
+    transform: scale(1.1);
+}

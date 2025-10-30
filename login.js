@@ -18,7 +18,7 @@
     }
 
     try {
-      const res = await fetch("http://localhost:4000/login", {
+      const res = await fetch("http://localhost:4000/api/v1/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
@@ -26,13 +26,12 @@
 
       let data;
       try {
-        data = await res.json(); 
+        data = await res.json();
       } catch {
         throw new Error("Respuesta del servidor no válida.");
       }
 
       if (res.ok && data.success) {
-        
         window.location.href = "./index.html";
       } else {
         errorLoginMsg.textContent =

@@ -1,5 +1,5 @@
 (function () {
-  const API = "http://localhost:4000/resenias";
+  const API = "http://localhost:4000/api/v1/resenias";
 
   let btn =
     document.querySelector("#btnEscribirResena") ||
@@ -160,14 +160,10 @@
     }
   }
 
- 
-
   function inicializarVotos() {
     document.querySelectorAll(".review-card").forEach((card, index) => {
-     
       if (card.querySelector(".vote-buttons")) return;
 
-  
       const voteContainer = document.createElement("div");
       voteContainer.classList.add("vote-buttons");
       voteContainer.style.display = "flex";
@@ -182,22 +178,18 @@
       btnDislike.innerHTML = '<i class="fas fa-thumbs-down"></i> No me gusta';
       btnDislike.classList.add("btn-dislike");
 
-      
       voteContainer.appendChild(btnLike);
       voteContainer.appendChild(btnDislike);
       card.appendChild(voteContainer);
 
-     
       const reviewId = `review_${index}`;
 
-      
       //const votoPrevio = localStorage.getItem(reviewId);
       //if (votoPrevio) {
-       // bloquearVoto(btnLike, btnDislike, votoPrevio);
-        //card.dataset.voted = "true";
+      // bloquearVoto(btnLike, btnDislike, votoPrevio);
+      //card.dataset.voted = "true";
       //}
 
-      
       btnLike.addEventListener("click", () => {
         manejarVoto(reviewId, "like", btnLike, btnDislike, card);
       });
@@ -219,12 +211,10 @@
       btnLike.classList.add("disabled");
     }
 
-    
     localStorage.setItem(reviewId, tipo);
     card.dataset.voted = "true";
   }
 
- 
   function bloquearVoto(btnLike, btnDislike, tipo) {
     if (tipo === "like") {
       btnLike.classList.add("active");
@@ -235,7 +225,6 @@
     }
   }
 
-  
   document.addEventListener("DOMContentLoaded", inicializarVotos);
 
   function mostrarMensajeResenas(texto, esError = false) {
@@ -302,9 +291,7 @@
   cargarResenas();
 })();
 
-
-
-const REST_API = "http://localhost:4000/restaurantes";
+const REST_API = "http://localhost:4000/api/v1/restaurantes";
 const searchInput = document.getElementById("searchInput");
 const resultadosContainer = document.getElementById("resultadosRestaurantes");
 const searchMessage = document.getElementById("searchMessage");
@@ -317,7 +304,6 @@ window.addEventListener("DOMContentLoaded", async () => {
   await cargarRestaurantesBackend();
 });
 
-
 async function cargarRestaurantesBackend() {
   try {
     const res = await fetch(REST_API);
@@ -326,10 +312,12 @@ async function cargarRestaurantesBackend() {
     restaurantesBackend = Array.isArray(data) ? data : [];
   } catch (err) {
     console.error("Error cargando restaurantes del backend:", err);
-    mostrarMensaje("No se pudieron cargar los restaurantes del servidor.", true);
+    mostrarMensaje(
+      "No se pudieron cargar los restaurantes del servidor.",
+      true
+    );
   }
 }
-
 
 if (searchInput) {
   searchInput.addEventListener("input", () => {
@@ -338,38 +326,44 @@ if (searchInput) {
   });
 }
 
-
 function buscarRestaurantes(query) {
   limpiarResultadosBackend();
   mostrarMensaje("");
 
   if (!query) {
-    cardsLocales.forEach(card => (card.style.display = ""));
+    cardsLocales.forEach((card) => (card.style.display = ""));
     mostrarMensaje("");
     return;
   }
 
-
   let coincidenciasLocales = 0;
-  cardsLocales.forEach(card => {
-    const nombre = card.querySelector(".card-title")?.textContent?.toLowerCase() || "";
-    const categoria = card.querySelector(".card-category")?.textContent?.toLowerCase() || "";
-    const descripcion = card.querySelector(".card-description")?.textContent?.toLowerCase() || "";
-    const coincide = nombre.includes(query) || categoria.includes(query) || descripcion.includes(query);
+  cardsLocales.forEach((card) => {
+    const nombre =
+      card.querySelector(".card-title")?.textContent?.toLowerCase() || "";
+    const categoria =
+      card.querySelector(".card-category")?.textContent?.toLowerCase() || "";
+    const descripcion =
+      card.querySelector(".card-description")?.textContent?.toLowerCase() || "";
+    const coincide =
+      nombre.includes(query) ||
+      categoria.includes(query) ||
+      descripcion.includes(query);
     card.style.display = coincide ? "" : "none";
     if (coincide) coincidenciasLocales++;
   });
 
-  const backendFiltrados = restaurantesBackend.filter(r =>
-    (r.nombre && r.nombre.toLowerCase().includes(query)) ||
-    (r.categoria && r.categoria.toLowerCase().includes(query)) ||
-    (r.descripcion && r.descripcion.toLowerCase().includes(query))
+  const backendFiltrados = restaurantesBackend.filter(
+    (r) =>
+      (r.nombre && r.nombre.toLowerCase().includes(query)) ||
+      (r.categoria && r.categoria.toLowerCase().includes(query)) ||
+      (r.descripcion && r.descripcion.toLowerCase().includes(query))
   );
 
-
-  backendFiltrados.forEach(r => {
-    const yaExiste = cardsLocales.some(card =>
-      card.querySelector(".card-title")?.textContent?.trim().toLowerCase() === r.nombre?.toLowerCase()
+  backendFiltrados.forEach((r) => {
+    const yaExiste = cardsLocales.some(
+      (card) =>
+        card.querySelector(".card-title")?.textContent?.trim().toLowerCase() ===
+        r.nombre?.toLowerCase()
     );
     if (!yaExiste) {
       const card = crearCardBackend(r);
@@ -377,13 +371,11 @@ function buscarRestaurantes(query) {
     }
   });
 
-
   const total = coincidenciasLocales + backendFiltrados.length;
   if (total === 0) {
     mostrarMensaje(`No se encontraron resultados para "${query}".`);
   }
 }
-
 
 function crearCardBackend(r) {
   const card = document.createElement("div");
@@ -413,12 +405,12 @@ function crearCardBackend(r) {
   return card;
 }
 
-
 function limpiarResultadosBackend() {
-  const cardsExtras = resultadosContainer.querySelectorAll(".restaurant-card[data-backend='true']");
-  cardsExtras.forEach(c => c.remove());
+  const cardsExtras = resultadosContainer.querySelectorAll(
+    ".restaurant-card[data-backend='true']"
+  );
+  cardsExtras.forEach((c) => c.remove());
 }
-
 
 function mostrarMensaje(texto, esError = false) {
   searchMessage.textContent = texto;
@@ -436,7 +428,6 @@ const formAdmin = document.getElementById("formAdminLogin");
 const errorAdminMsg = document.getElementById("errorAdminMsg");
 
 (function () {
-  
   let modalLogin = document.querySelector(".modal-login");
   if (!modalLogin) {
     modalLogin = document.createElement("div");
@@ -461,7 +452,6 @@ const errorAdminMsg = document.getElementById("errorAdminMsg");
     document.body.appendChild(modalLogin);
   }
 
-  
   if (!document.getElementById("estilos-modal-login")) {
     const style = document.createElement("style");
     style.id = "estilos-modal-login";
@@ -486,14 +476,12 @@ const errorAdminMsg = document.getElementById("errorAdminMsg");
     document.head.appendChild(style);
   }
 
- 
   const btnLogin =
     document.querySelector("#btnLogin") || document.querySelector(".btn-admin");
   const formLogin = document.getElementById("formLogin");
   const closeX = modalLogin.querySelector(".close-x");
   const errorLoginMsg = modalLogin.querySelector("#errorLoginMsg");
 
-  
   if (btnLogin) {
     btnLogin.addEventListener("click", (e) => {
       e.preventDefault();
@@ -503,7 +491,6 @@ const errorAdminMsg = document.getElementById("errorAdminMsg");
     });
   }
 
-  
   closeX.addEventListener("click", () => (modalLogin.style.display = "none"));
   modalLogin.addEventListener("click", (ev) => {
     if (ev.target === modalLogin) modalLogin.style.display = "none";
@@ -512,7 +499,6 @@ const errorAdminMsg = document.getElementById("errorAdminMsg");
     if (ev.key === "Escape") modalLogin.style.display = "none";
   });
 
- 
   formLogin.addEventListener("submit", async (e) => {
     e.preventDefault();
     errorLoginMsg.style.display = "none";
@@ -527,7 +513,7 @@ const errorAdminMsg = document.getElementById("errorAdminMsg");
     }
 
     try {
-      const res = await fetch("http://localhost:4000/admin", {
+      const res = await fetch("http://localhost:4000/api/v1/admin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
@@ -537,7 +523,6 @@ const errorAdminMsg = document.getElementById("errorAdminMsg");
         throw new Error("Credenciales incorrectas");
       }
 
-      
       window.location.href = "./admin.html";
     } catch (err) {
       console.error(err);
@@ -547,7 +532,3 @@ const errorAdminMsg = document.getElementById("errorAdminMsg");
     }
   });
 })();
-
-
-
-
