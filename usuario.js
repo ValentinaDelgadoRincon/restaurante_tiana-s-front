@@ -13,12 +13,9 @@ function getAuthToken() {
 document.addEventListener("DOMContentLoaded", () => {
   const token = getAuthToken();
   if (!token) {
-    
     window.location.href = "./index.html";
     return;
   }
-  
-  cargarResenas();
 });
 
 (function () {
@@ -168,7 +165,6 @@ box-shadow:0 2px 8px rgba(0,0,0,0.05);
     if (ev.key === "Escape") modal.style.display = "none";
   });
 
-  
   async function cargarResenas() {
     try {
       const token = getAuthToken();
@@ -190,6 +186,39 @@ box-shadow:0 2px 8px rgba(0,0,0,0.05);
         true
       );
     }
+  }
+
+  function renderResenas(reseñas = []) {
+    contenedorResenas.innerHTML = "";
+    if (!reseñas.length) {
+      contenedorResenas.innerHTML =
+        '<p class="mensaje-resenas">No hay reseñas aún.</p>';
+      return;
+    }
+
+    reseñas.forEach((r) => {
+      const card = document.createElement("div");
+      card.className = "resena";
+
+      const estrellas = Array.from({ length: r.calificacion || 0 })
+        .map(() => "★")
+        .join("");
+      const estrellasVacias = Array.from({ length: 5 - (r.calificacion || 0) })
+        .map(() => "☆")
+        .join("");
+
+      card.innerHTML = `
+<div class="resena-header">
+<strong>${escapeHtml(r.nombre || "Usuario")}</strong>
+<div class="estrellas">${estrellas}${estrellasVacias}</div>
+</div>
+<p class="resena-text">${escapeHtml(r.comentario || "")}</p>
+`;
+
+      contenedorResenas.appendChild(card);
+    });
+
+    inicializarVotos();
   }
 
   function inicializarVotos() {
@@ -215,12 +244,6 @@ box-shadow:0 2px 8px rgba(0,0,0,0.05);
       card.appendChild(voteContainer);
 
       const reviewId = `review_${index}`;
-
-      //const votoPrevio = localStorage.getItem(reviewId);
-      //if (votoPrevio) {
-      // bloquearVoto(btnLike, btnDislike, votoPrevio);
-      //card.dataset.voted = "true";
-      //}
 
       btnLike.addEventListener("click", () => {
         manejarVoto(reviewId, "like", btnLike, btnDislike, card);
@@ -349,7 +372,6 @@ window.addEventListener("DOMContentLoaded", async () => {
   await cargarRestaurantesBackend();
 });
 
-
 async function cargarRestaurantesBackend() {
   try {
     const token = getAuthToken();
@@ -364,7 +386,7 @@ async function cargarRestaurantesBackend() {
     if (!res.ok) throw new Error("Error al obtener restaurantes");
     const data = await res.json();
     restaurantesBackend = Array.isArray(data) ? data : [];
-    renderizarRestaurantes(restaurantesBackend); 
+    renderizarRestaurantes(restaurantesBackend);
   } catch (err) {
     console.error("Error cargando restaurantes del backend:", err);
     mostrarMensaje(
@@ -374,12 +396,10 @@ async function cargarRestaurantesBackend() {
   }
 }
 
-
 function renderizarRestaurantes(restaurantes) {
   const container =
     document.getElementById("restaurantes-container") || resultadosContainer;
 
-  
   container.innerHTML = "";
 
   if (!restaurantes.length) {
@@ -393,7 +413,6 @@ function renderizarRestaurantes(restaurantes) {
     container.appendChild(card);
   });
 }
-
 
 function crearCardBackend(r) {
   const card = document.createElement("div");
@@ -425,31 +444,60 @@ ${
 </div>
 `;
 
- 
   const btnLike = card.querySelector(".btn-like");
+  const likesSpan = card.querySelector(".likes-counter span");
+
   if (btnLike) {
     btnLike.addEventListener("click", async () => {
+      const userId = getUserId();
+      if (!userId) {
+        alert("Necesitas iniciar sesión para dar like.");
+        return;
+      }
+
+      const currentLikes = Array.isArray(r.likes) ? [...r.likes] : [];
+      const alreadyLiked = currentLikes.includes(userId);
+      const newLikes = alreadyLiked
+        ? currentLikes.filter((id) => id !== userId)
+        : [...currentLikes, userId];
+
+      likesSpan.textContent = `${newLikes.length} likes`;
+      btnLike.innerHTML = newLikes.includes(userId)
+        ? '<i class="fas fa-heart"></i> Me gusta'
+        : '<i class="far fa-heart"></i> Me gusta';
+
       try {
         const token = getAuthToken();
-        const res = await fetch(`${REST_API}/${r._id}/like`, {
-          method: "POST",
+        if (!token) throw new Error("No hay token de autenticación");
+
+        const res = await fetch(`${REST_API}/${r._id}`, {
+          method: "PATCH",
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
+          body: JSON.stringify({ likes: newLikes }),
         });
-        if (res.ok) {
-          await cargarRestaurantesBackend(); 
+
+        if (!res.ok) {
+          throw new Error("Error en la actualización del servidor");
         }
+
+        r.likes = newLikes;
+        const idx = restaurantesBackend.findIndex((x) => x._id === r._id);
+        if (idx >= 0) restaurantesBackend[idx].likes = newLikes;
       } catch (err) {
-        console.error("Error al dar like:", err);
+        console.error("Error al actualizar likes:", err);
+        likesSpan.textContent = `${r.likes ? r.likes.length : 0} likes`;
+        btnLike.innerHTML = r.likes?.includes(getUserId())
+          ? '<i class="fas fa-heart"></i> Me gusta'
+          : '<i class="far fa-heart"></i> Me gusta';
       }
     });
   }
 
   return card;
 }
-
 
 function getUserId() {
   const authData = sessionStorage.getItem("authData");
