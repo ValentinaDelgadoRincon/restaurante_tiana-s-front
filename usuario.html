@@ -655,8 +655,33 @@
     </form>
   </div>
 </div>
+<!-- Modal para nueva reseña -->
+<div id="modalReview" class="modal-admin" style="display:none;">
+  <div class="modal-card">
+    <span class="close-x" id="closeReview" title="Cerrar">&times;</span>
+    <h2>Escribir Reseña</h2>
+    <form id="formReview">
+      <label for="reviewComentario">Comentario</label>
+      <textarea id="reviewComentario" rows="4" placeholder="Escribe tu experiencia..." required></textarea>
 
-    <script src="./usuario.js"></script>
+      <label>Calificación</label>
+      <div class="rating-stars" id="ratingStars">
+        <i class="fas fa-star" data-value="1"></i>
+        <i class="fas fa-star" data-value="2"></i>
+        <i class="fas fa-star" data-value="3"></i>
+        <i class="fas fa-star" data-value="4"></i>
+        <i class="fas fa-star" data-value="5"></i>
+      </div>
+
+      <button type="submit">Enviar Reseña</button>
+    </form>
+  </div>
+</div>
+
+
+    <script type="module" src="./usuario.js"></script>
+    <script type="module" src="./api.js"></script>
+
 </body>
 
 </html>

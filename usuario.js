@@ -1,511 +1,192 @@
-function getAuthToken() {
-  const authData = sessionStorage.getItem("authData");
-  if (!authData) return null;
+import { api } from "./api.js";
+
+const btnAdmin = document.getElementById("btnAdmin");
+const modal = document.getElementById("modalAdminLogin");
+const closeX = modal.querySelector(".close-x");
+const formAdmin = document.getElementById("formAdminLogin");
+const errorMsg = document.getElementById("errorAdminMsg");
+const searchBtn = document.getElementById("searchBtn");
+const searchInput = document.getElementById("searchInput");
+const resultados = document.getElementById("resultadosRestaurantes");
+const msg = document.getElementById("searchMessage");
+const reseñasContenedor = document.querySelector(".reviews-section");
+const btnReview = document.querySelector(".btn-review");
+
+let token = localStorage.getItem("token");
+
+
+btnAdmin.addEventListener("click", () => {
+  modal.style.display = "flex";
+});
+
+closeX.addEventListener("click", () => {
+  modal.style.display = "none";
+});
+
+window.addEventListener("click", (e) => {
+  if (e.target === modal) modal.style.display = "none";
+});
+
+
+formAdmin.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const correo = document.getElementById("adminUser").value.trim();
+  const contrasenia = document.getElementById("adminPass").value.trim();
+  errorMsg.style.display = "none";
+
   try {
-    const data = JSON.parse(authData);
-    return data.token;
-  } catch (e) {
-    console.error("Error parsing auth token:", e);
-    return null;
+    const data = await api.usuarios.login({ correo, contrasenia });
+    localStorage.setItem("token", data.token);
+    modal.style.display = "none";
+    alert("Bienvenido, administrador");
+    window.location.href = "admin.html";
+  } catch (err) {
+    errorMsg.textContent = "Credenciales incorrectas";
+    errorMsg.style.display = "block";
+  }
+});
+
+
+searchBtn.addEventListener("click", buscarRestaurantes);
+searchInput.addEventListener(
+  "keypress",
+  (e) => e.key === "Enter" && buscarRestaurantes()
+);
+
+async function buscarRestaurantes() {
+  const query = searchInput.value.trim();
+  msg.textContent = "Buscando...";
+  resultados.innerHTML = "";
+
+  try {
+    const data = await api.restaurantes.buscar(query);
+    if (!data || data.length === 0) {
+      msg.textContent = "No se encontraron resultados ";
+      return;
+    }
+
+    msg.textContent = `Se encontraron ${data.length} resultados 🍽️`;
+    data.forEach((r) => {
+      const card = document.createElement("div");
+      card.classList.add("restaurant-card");
+      card.innerHTML = `
+        <div class="card-content">
+          <h3>${r.nombre}</h3>
+          <p>${r.descripcion || "Sin descripción disponible"}</p>
+          <p><strong>Categoría:</strong> ${r.categoria}</p>
+          <div class="rating"><i class="fas fa-star"></i> ${
+            r.calificacion ?? "N/A"
+          }</div>
+        </div>`;
+      resultados.appendChild(card);
+    });
+  } catch {
+    msg.textContent = "Error al conectar con el servidor ";
   }
 }
+
+
+async function cargarReseñas() {
+  reseñasContenedor.innerHTML = "<p>Cargando reseñas...</p>";
+  try {
+    const data = await api.reseñas.listar();
+    reseñasContenedor.innerHTML = "";
+    data.forEach((r) => {
+      const div = document.createElement("div");
+      div.classList.add("review-card");
+      div.innerHTML = `
+        <div class="review-header">
+          <div class="reviewer-info">
+            <div class="reviewer-avatar">${
+              r.usuario?.charAt(0).toUpperCase() ?? "?"
+            }</div>
+            <div>
+              <div class="reviewer-name">${r.usuario}</div>
+              <div class="review-date">${new Date(
+                r.fecha
+              ).toLocaleDateString()}</div>
+            </div>
+          </div>
+          <div class="review-rating">⭐ ${r.calificacion}</div>
+        </div>
+        <p class="review-text">${r.comentario}</p>
+        <div class="review-actions">
+          <button class="btn-like" data-id="${r._id}">👍 ${
+        r.likes || 0
+      }</button>
+        </div>`;
+      reseñasContenedor.appendChild(div);
+    });
+  } catch {
+    reseñasContenedor.innerHTML = "<p>No se pudieron cargar reseñas 😢</p>";
+  }
+}
+
+
+document.addEventListener("click", async (e) => {
+  if (e.target.classList.contains("btn-like")) {
+    const id = e.target.dataset.id;
+    try {
+      await api.reseñas.like(id, token);
+      cargarReseñas();
+    } catch {
+      alert("Debes iniciar sesión para dar like 👍");
+    }
+  }
+});
+
+
 
 document.addEventListener("DOMContentLoaded", () => {
-  const token = getAuthToken();
-  if (!token) {
-    window.location.href = "./index.html";
-    return;
-  }
+  cargarReseñas();
 });
 
-(function () {
-  const API = "http://localhost:4000/api/v1/resenias";
 
-  let btn =
-    document.querySelector("#btnEscribirResena") ||
-    Array.from(document.querySelectorAll("button")).find(
-      (b) =>
-        b.textContent &&
-        b.textContent.trim().toLowerCase().includes("escribir reseña")
-    );
+const modalReview = document.getElementById("modalReview");
+const closeReview = document.getElementById("closeReview");
+const formReview = document.getElementById("formReview");
+const ratingStars = document.getElementById("ratingStars").querySelectorAll("i");
+let selectedRating = 0;
 
-  if (!btn) {
-    console.warn('No se encontró el botón "Escribir reseña".');
-    return;
-  }
-
-  let contenedorResenas = document.querySelector("#reseñas .reviews-section");
-  if (!contenedorResenas) {
-    console.warn(
-      'No se encontró la sección ".reviews-section" dentro de #reseñas.'
-    );
-    return;
-  }
-
-  let modal = document.querySelector(".modal-resena");
-  if (!modal) {
-    modal = document.createElement("div");
-    modal.className = "modal-resena";
-    modal.innerHTML = `
-<div class="modal-card" role="dialog" aria-modal="true">
-<span class="close-x" title="Cerrar">&times;</span>
-<h2>Escribir reseña</h2>
-<form id="formResenaDin">
-<label for="nombreRes">Tu nombre</label>
-<input id="nombreRes" name="nombre" type="text" required placeholder="Tu nombre">
-
-<label>Calificación</label>
-<div id="ratingStars" class="rating-stars">
-<i class="fas fa-star" data-value="1"></i>
-<i class="fas fa-star" data-value="2"></i>
-<i class="fas fa-star" data-value="3"></i>
-<i class="fas fa-star" data-value="4"></i>
-<i class="fas fa-star" data-value="5"></i>
-</div>
-<input type="hidden" id="calificacionRes" name="calificacion" value="0" required>
-
-
-<label for="comentarioRes">Reseña</label>
-<textarea id="comentarioRes" name="comentario" rows="4" required placeholder="Escribe tu opinión..."></textarea>
-
-<p id="errorModalMsg" class="error-modal-msg" style="display:none;"></p>
-
-<button type="submit">Enviar reseña</button>
-</form>
-</div>
-`;
-    document.body.appendChild(modal);
-  }
-
-  const starContainer = modal.querySelector("#ratingStars");
-  const hiddenInput = modal.querySelector("#calificacionRes");
-
-  if (starContainer) {
-    const stars = Array.from(starContainer.querySelectorAll("i"));
-
-    stars.forEach((star) => {
-      star.addEventListener("click", () => {
-        const value = parseInt(star.dataset.value, 10);
-        hiddenInput.value = value;
-
-        stars.forEach((s) => {
-          s.style.color =
-            parseInt(s.dataset.value, 10) <= value ? "#f5c518" : "#ccc";
-        });
-      });
-
-      star.addEventListener("mouseover", () => {
-        const hoverValue = parseInt(star.dataset.value, 10);
-        stars.forEach((s) => {
-          s.style.color =
-            parseInt(s.dataset.value, 10) <= hoverValue ? "#f5c518" : "#ccc";
-        });
-      });
-
-      star.addEventListener("mouseout", () => {
-        const currentValue = parseInt(hiddenInput.value, 10);
-        stars.forEach((s) => {
-          s.style.color =
-            parseInt(s.dataset.value, 10) <= currentValue ? "#f5c518" : "#ccc";
-        });
-      });
-    });
-  }
-
-  if (!document.getElementById("estilos-modal-resenas")) {
-    const style = document.createElement("style");
-    style.id = "estilos-modal-resenas";
-    style.textContent = `
-.modal-resena {
-display:none; position:fixed; z-index:9999; left:0; top:0; width:100%; height:100%;
-background:rgba(165,155,160,0.63); align-items:center; justify-content:center;
-}
-.modal-card {
-background:rgba(241,125,187,0.95); border-radius:10px; max-width:420px; width:90%;
-padding:20px; box-shadow:0 6px 30px rgba(0,0,0,0.3);
-}
-.close-x { float:right; font-size:22px; cursor:pointer; }
-.modal-card h2 { margin-top:0; }
-.modal-resena input, .modal-resena textarea {
-width:100%; margin-top:6px; border-radius:6px; border:1px solid #ccc; padding:8px;
-}
-.modal-resena button[type="submit"] {
-margin-top:12px; background:#764ba2; color:white; border:none;
-border-radius:6px; padding:10px 16px; cursor:pointer;
-}
-.error-modal-msg {
-color:#b30000; font-weight:600; margin:10px 0 0; text-align:center;
-}
-.resena { background:#fff; border-radius:8px; padding:12px; margin-bottom:10px;
-box-shadow:0 2px 8px rgba(0,0,0,0.05);
-}
-.estrellas { color:#f5c518; margin-bottom:6px; }
-.mensaje-resenas { text-align:center; font-weight:500; margin:12px 0; }
-.mensaje-error { color:red; }
-`;
-    document.head.appendChild(style);
-  }
-
-  const form = document.getElementById("formResenaDin");
-  const closeX = modal.querySelector(".close-x");
-  const errorModalMsg = modal.querySelector("#errorModalMsg");
-
-  btn.addEventListener("click", (e) => {
-    e.preventDefault();
-    modal.style.display = "flex";
-    document.getElementById("nombreRes").focus();
-    errorModalMsg.style.display = "none";
-  });
-
-  closeX.addEventListener("click", () => (modal.style.display = "none"));
-  modal.addEventListener("click", (ev) => {
-    if (ev.target === modal) modal.style.display = "none";
-  });
-  document.addEventListener("keydown", (ev) => {
-    if (ev.key === "Escape") modal.style.display = "none";
-  });
-
-  async function cargarResenas() {
-    try {
-      const token = getAuthToken();
-      if (!token) throw new Error("No hay token de autenticación");
-
-      const res = await fetch(API, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-      if (!res.ok) throw new Error("Error en la solicitud: " + res.status);
-      const data = await res.json();
-      renderResenas(Array.isArray(data) ? data : []);
-    } catch (err) {
-      console.error("Error cargando reseñas:", err);
-      mostrarMensajeResenas(
-        "No se pudieron cargar las reseñas. Verifica el servidor.",
-        true
-      );
-    }
-  }
-
-  function renderResenas(reseñas = []) {
-    contenedorResenas.innerHTML = "";
-    if (!reseñas.length) {
-      contenedorResenas.innerHTML =
-        '<p class="mensaje-resenas">No hay reseñas aún.</p>';
-      return;
-    }
-
-    reseñas.forEach((r) => {
-      const card = document.createElement("div");
-      card.className = "resena";
-
-      const estrellas = Array.from({ length: r.calificacion || 0 })
-        .map(() => "★")
-        .join("");
-      const estrellasVacias = Array.from({ length: 5 - (r.calificacion || 0) })
-        .map(() => "☆")
-        .join("");
-
-      card.innerHTML = `
-<div class="resena-header">
-<strong>${escapeHtml(r.nombre || "Usuario")}</strong>
-<div class="estrellas">${estrellas}${estrellasVacias}</div>
-</div>
-<p class="resena-text">${escapeHtml(r.comentario || "")}</p>
-`;
-
-      contenedorResenas.appendChild(card);
-    });
-
-    inicializarVotos();
-  }
-
-  function inicializarVotos() {
-    document.querySelectorAll(".review-card").forEach((card, index) => {
-      if (card.querySelector(".vote-buttons")) return;
-
-      const voteContainer = document.createElement("div");
-      voteContainer.classList.add("vote-buttons");
-      voteContainer.style.display = "flex";
-      voteContainer.style.gap = "10px";
-      voteContainer.style.marginTop = "10px";
-
-      const btnLike = document.createElement("button");
-      btnLike.innerHTML = '<i class="fas fa-thumbs-up"></i> Me gusta';
-      btnLike.classList.add("btn-like");
-
-      const btnDislike = document.createElement("button");
-      btnDislike.innerHTML = '<i class="fas fa-thumbs-down"></i> No me gusta';
-      btnDislike.classList.add("btn-dislike");
-
-      voteContainer.appendChild(btnLike);
-      voteContainer.appendChild(btnDislike);
-      card.appendChild(voteContainer);
-
-      const reviewId = `review_${index}`;
-
-      btnLike.addEventListener("click", () => {
-        manejarVoto(reviewId, "like", btnLike, btnDislike, card);
-      });
-
-      btnDislike.addEventListener("click", () => {
-        manejarVoto(reviewId, "dislike", btnLike, btnDislike, card);
-      });
-    });
-  }
-
-  function manejarVoto(reviewId, tipo, btnLike, btnDislike, card) {
-    if (card.dataset.voted === "true") return;
-
-    if (tipo === "like") {
-      btnLike.classList.add("active");
-      btnDislike.classList.add("disabled");
-    } else {
-      btnDislike.classList.add("active");
-      btnLike.classList.add("disabled");
-    }
-
-    localStorage.setItem(reviewId, tipo);
-    card.dataset.voted = "true";
-  }
-
-  function bloquearVoto(btnLike, btnDislike, tipo) {
-    if (tipo === "like") {
-      btnLike.classList.add("active");
-      btnDislike.classList.add("disabled");
-    } else {
-      btnDislike.classList.add("active");
-      btnLike.classList.add("disabled");
-    }
-  }
-
-  document.addEventListener("DOMContentLoaded", inicializarVotos);
-
-  function mostrarMensajeResenas(texto, esError = false) {
-    const msg = document.createElement("p");
-    msg.className = `mensaje-resenas ${esError ? "mensaje-error" : ""}`;
-    msg.textContent = texto;
-    contenedorResenas.appendChild(msg);
-  }
-
-  function escapeHtml(s) {
-    return s.replace(
-      /[&<>"']/g,
-      (m) =>
-        ({
-          "&": "&amp;",
-          "<": "&lt;",
-          ">": "&gt;",
-          '"': "&quot;",
-          "'": "&#39;",
-        }[m])
-    );
-  }
-
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    errorModalMsg.style.display = "none";
-    const nombre = document.getElementById("nombreRes").value.trim();
-    const calificacion = parseInt(
-      document.getElementById("calificacionRes").value || "0",
-      10
-    );
-    const comentario = document.getElementById("comentarioRes").value.trim();
-
-    if (!nombre || !comentario || calificacion < 1 || calificacion > 5) {
-      errorModalMsg.textContent =
-        "Por favor completa todos los campos y usa una calificación válida (1–5).";
-      errorModalMsg.style.display = "block";
-      return;
-    }
-
-    const payload = {
-      nombre,
-      calificacion,
-      comentario,
-      platoId,
-      restauranteId,
-      usuarioId,
-    };
-
-    try {
-      const token = getAuthToken();
-      if (!token) throw new Error("No hay token de autenticación");
-
-      const res = await fetch(API, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
-
-      if (!res.ok) throw new Error(`Error ${res.status}`);
-
-      modal.style.display = "none";
-      form.reset();
-      await cargarResenas();
-      alert("Reseña enviada con éxito.");
-    } catch (err) {
-      console.error("Error enviando reseña:", err);
-      errorModalMsg.textContent =
-        "No se pudo enviar la reseña. Verifica tu conexión o el servidor.";
-      errorModalMsg.style.display = "block";
-    }
-  });
-
-  cargarResenas();
-})();
-
-const REST_API = "http://localhost:4000/api/v1/restaurantes";
-const searchInput = document.getElementById("searchInput");
-const resultadosContainer = document.getElementById("resultadosRestaurantes");
-const searchMessage = document.getElementById("searchMessage");
-
-let restaurantesBackend = [];
-let cardsLocales = [];
-
-window.addEventListener("DOMContentLoaded", async () => {
-  cardsLocales = Array.from(document.querySelectorAll(".restaurant-card"));
-  await cargarRestaurantesBackend();
+btnReview.addEventListener("click", () => {
+  modalReview.style.display = "flex";
 });
 
-async function cargarRestaurantesBackend() {
-  try {
-    const token = getAuthToken();
-    if (!token) throw new Error("No hay token de autenticación");
+closeReview.addEventListener("click", () => {
+  modalReview.style.display = "none";
+});
 
-    const res = await fetch(REST_API, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    });
-    if (!res.ok) throw new Error("Error al obtener restaurantes");
-    const data = await res.json();
-    restaurantesBackend = Array.isArray(data) ? data : [];
-    renderizarRestaurantes(restaurantesBackend);
-  } catch (err) {
-    console.error("Error cargando restaurantes del backend:", err);
-    mostrarMensaje(
-      "No se pudieron cargar los restaurantes del servidor.",
-      true
+window.addEventListener("click", (e) => {
+  if (e.target === modalReview) modalReview.style.display = "none";
+});
+
+ratingStars.forEach((star) => {
+  star.addEventListener("click", () => {
+    selectedRating = parseInt(star.dataset.value);
+    ratingStars.forEach((s) =>
+      s.classList.toggle("active", parseInt(s.dataset.value) <= selectedRating)
     );
-  }
-}
+  });
+});
 
-function renderizarRestaurantes(restaurantes) {
-  const container =
-    document.getElementById("restaurantes-container") || resultadosContainer;
-
-  container.innerHTML = "";
-
-  if (!restaurantes.length) {
-    container.innerHTML =
-      '<p class="no-results">No hay restaurantes disponibles</p>';
+formReview.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const comentario = document.getElementById("reviewComentario").value.trim();
+  const calificacion = selectedRating;
+  if (!comentario || calificacion === 0) {
+    alert("Por favor completa todos los campos ⭐");
     return;
   }
 
-  restaurantes.forEach((restaurante) => {
-    const card = crearCardBackend(restaurante);
-    container.appendChild(card);
-  });
-}
-
-function crearCardBackend(r) {
-  const card = document.createElement("div");
-  card.className = "restaurant-card";
-  card.dataset.backend = "true";
-  card.innerHTML = `
-<div class="card-content">
-<div class="card-header">
-<h3 class="card-title">${r.nombre}</h3>
-</div>
-<p class="card-category">${r.categoria || "Sin categoría"}</p>
-<p class="card-description">${r.descripcion || ""}</p>
-<p class="card-location"><i class="fas fa-map-marker-alt"></i> ${
-    r.ubicacion || ""
-  }</p>
-<div class="card-footer">
-<div class="likes-counter">
-<i class="fas fa-heart"></i>
-<span>${r.likes ? r.likes.length : 0} likes</span>
-</div>
-<button class="btn-like" data-id="${r._id}">
-${
-  r.likes?.includes(getUserId())
-    ? '<i class="fas fa-heart"></i> Me gusta'
-    : '<i class="far fa-heart"></i> Me gusta'
-}
-</button>
-</div>
-</div>
-`;
-
-  const btnLike = card.querySelector(".btn-like");
-  const likesSpan = card.querySelector(".likes-counter span");
-
-  if (btnLike) {
-    btnLike.addEventListener("click", async () => {
-      const userId = getUserId();
-      if (!userId) {
-        alert("Necesitas iniciar sesión para dar like.");
-        return;
-      }
-
-      const currentLikes = Array.isArray(r.likes) ? [...r.likes] : [];
-      const alreadyLiked = currentLikes.includes(userId);
-      const newLikes = alreadyLiked
-        ? currentLikes.filter((id) => id !== userId)
-        : [...currentLikes, userId];
-
-      likesSpan.textContent = `${newLikes.length} likes`;
-      btnLike.innerHTML = newLikes.includes(userId)
-        ? '<i class="fas fa-heart"></i> Me gusta'
-        : '<i class="far fa-heart"></i> Me gusta';
-
-      try {
-        const token = getAuthToken();
-        if (!token) throw new Error("No hay token de autenticación");
-
-        const res = await fetch(`${REST_API}/${r._id}`, {
-          method: "PATCH",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ likes: newLikes }),
-        });
-
-        if (!res.ok) {
-          throw new Error("Error en la actualización del servidor");
-        }
-
-        r.likes = newLikes;
-        const idx = restaurantesBackend.findIndex((x) => x._id === r._id);
-        if (idx >= 0) restaurantesBackend[idx].likes = newLikes;
-      } catch (err) {
-        console.error("Error al actualizar likes:", err);
-        likesSpan.textContent = `${r.likes ? r.likes.length : 0} likes`;
-        btnLike.innerHTML = r.likes?.includes(getUserId())
-          ? '<i class="fas fa-heart"></i> Me gusta'
-          : '<i class="far fa-heart"></i> Me gusta';
-      }
-    });
-  }
-
-  return card;
-}
-
-function getUserId() {
-  const authData = sessionStorage.getItem("authData");
-  if (!authData) return null;
   try {
-    const data = JSON.parse(authData);
-    return data.id;
-  } catch (e) {
-    return null;
+    await api.reseñas.crear({ comentario, calificacion }, token);
+    alert("Reseña enviada correctamente");
+    modalReview.style.display = "none";
+    formReview.reset();
+    selectedRating = 0;
+    ratingStars.forEach((s) => s.classList.remove("active"));
+    cargarReseñas();
+  } catch {
+    alert("Debes iniciar sesión para escribir reseñas");
   }
-}
+});
