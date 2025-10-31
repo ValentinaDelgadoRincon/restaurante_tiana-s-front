@@ -656,7 +656,20 @@
   </div>
 </div>
 
-    <script src="./usuario.js"></script>
+        <script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const authData = sessionStorage.getItem("authData");
+    if (!authData) {
+      window.location.href = "./login.html";
+      return;
+    }
+
+    const { usuario } = JSON.parse(authData);
+    if (usuario.rol === "admin") {
+      window.location.href = "./admin.html";
+    }
+  });
+</script>
 </body>
 
 </html>
