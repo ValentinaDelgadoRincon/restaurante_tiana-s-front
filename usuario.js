@@ -54,6 +54,7 @@ searchInput.addEventListener(
 );
 
 async function buscarRestaurantes() {
+  console.log("hola");
   const query = searchInput.value.trim();
   msg.textContent = "Buscando...";
   resultados.innerHTML = "";

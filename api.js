@@ -61,8 +61,11 @@ export const api = {
   // --- RESEÑAS---
   reseñas: {
     async listar() {
-      const res = await fetch(`${BASE_URL}/resenias`);
+      const token = localStorage.getItem("token");
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      const res = await fetch(`${BASE_URL}/resenias`,{headers});
       if (!res.ok) throw new Error("Error al obtener reseñas");
+      console.log(res);
       return res.json();
     },
 
