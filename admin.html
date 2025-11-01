@@ -1,165 +1,128 @@
+
 <!DOCTYPE html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel de Administración</title>
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
-    <link rel="stylesheet" href="./admin.css" />
-  </head>
-  <body>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="./admin.css">
+</head>
+<body>
     <nav class="navbar">
-      <h2><i class="fas fa-utensils"></i> Panel de Administración</h2>
-      <button class="btn-back" onclick="window.location.href='index.html'">
-        <i class="fas fa-arrow-left"></i> Volver al sitio
-      </button>
+        <h2><i class="fas fa-utensils"></i> Panel de Administración</h2>
+        <button class="btn-back" onclick="window.location.href='index.html'">
+            <i class="fas fa-arrow-left"></i> Volver al sitio
+        </button>
     </nav>
 
     <div class="container">
-      <div class="admin-header">
-        <h1>Gestión de Restaurantes</h1>
-        <button class="btn-add" onclick="openModal()">
-          <i class="fas fa-plus"></i> Agregar Restaurante
-        </button>
-      </div>
+        <div class="admin-header">
+            <h1>Gestión de Restaurantes</h1>
+            <button class="btn-add" onclick="openModal()">
+                <i class="fas fa-plus"></i> Agregar Restaurante
+            </button>
+        </div>
 
-      <div class="search-filter">
-        <input
-          type="text"
-          id="searchInput"
-          placeholder="Buscar restaurante..."
-          onkeyup="filterTable()"
-        />
-        <select id="categoryFilter" onchange="filterTable()">
-          <option value="">Todas las categorías</option>
-          <option value="comida rapida">Comida Rápida</option>
-          <option value="sushi">Sushi</option>
-          <option value="vegetariano">Vegetariano</option>
-          <option value="gourmet">Gourmet</option>
-        </select>
-        <select id="ratingFilter" onchange="filterTable()">
-          <option value="">Todas las calificaciones</option>
-          <option value="5">5 estrellas</option>
-          <option value="4">4+ estrellas</option>
-          <option value="3">3+ estrellas</option>
-        </select>
-      </div>
+        <div class="search-filter">
+            <input type="text" id="searchInput" placeholder="Buscar restaurante..." onkeyup="filterTable()">
+            <select id="categoryFilter" onchange="filterTable()">
+                <option value="">Todas las categorías</option>
+                <option value="comida rapida">Comida Rápida</option>
+                <option value="sushi">Sushi</option>
+                <option value="vegetariano">Vegetariano</option>
+                <option value="gourmet">Gourmet</option>
+            </select>
+            <select id="ratingFilter" onchange="filterTable()">
+                <option value="">Todas las calificaciones</option>
+                <option value="5">5 estrellas</option>
+                <option value="4">4+ estrellas</option>
+                <option value="3">3+ estrellas</option>
+            </select>
+        </div>
 
-      <div class="restaurants-table">
-        <table id="restaurantsTable">
-          <thead>
-            <tr>
-              <th>Nombre</th>
-              <th>Categoría</th>
-              <th>Calificación</th>
-              <th>Precio</th>
-              <th>Ubicación</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody id="tableBody">
-            <!-- Data will be loaded here -->
-          </tbody>
-        </table>
-      </div>
+        <div class="restaurants-table">
+            <table id="restaurantsTable">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Categoría</th>
+                        <th>Calificación</th>
+                        <th>Precio</th>
+                        <th>Ubicación</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <!-- Data will be loaded here -->
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <!-- Modal -->
     <div class="modal" id="restaurantModal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2 id="modalTitle">Agregar Restaurante</h2>
-          <button class="btn-close" onclick="closeModal()">&times;</button>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Agregar Restaurante</h2>
+                <button class="btn-close" onclick="closeModal()">&times;</button>
+            </div>
+            <form id="restaurantForm">
+                <div class="form-group">
+                    <label for="name">Nombre del Restaurante *</label>
+                    <input type="text" id="name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="category">Categoría *</label>
+                    <select id="category" required>
+                        <option value="">Seleccionar categoría</option>
+                        <option value="comida rapida">Comida Rápida</option>
+                        <option value="sushi">Sushi</option>
+                        <option value="vegetariano">Vegetariano</option>
+                        <option value="gourmet">Gourmet</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Descripción</label>
+                    <textarea id="description" placeholder="Describe el restaurante..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="rating">Calificación *</label>
+                    <input type="number" id="rating" min="0" max="5" step="0.1" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="price">Rango de Precio *</label>
+                    <select id="price" required>
+                        <option value="">Seleccionar</option>
+                        <option value="Económico">Económico</option>
+                        <option value="Moderado">Moderado</option>
+                        <option value="Caro">Caro</option>
+                        <option value="Muy Caro">Muy Caro</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="location">Ubicación</label>
+                    <input type="text" id="location" placeholder="Dirección del restaurante">
+                </div>
+
+                <div class="form-group">
+                    <label for="delivery">Tiempo de Entrega (min)</label>
+                    <input type="number" id="delivery" placeholder="30">
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel" onclick="closeModal()">Cancelar</button>
+                    <button type="submit" class="btn-save">Guardar</button>
+                </div>
+            </form>
         </div>
-        <form id="restaurantForm">
-          <div class="form-group">
-            <label for="name">Nombre del Restaurante *</label>
-            <input type="text" id="name" required />
-          </div>
-
-          <div class="form-group">
-            <label for="category">Categoría *</label>
-            <select id="category" required>
-              <option value="">Seleccionar categoría</option>
-              <option value="comida rapida">Comida Rápida</option>
-              <option value="sushi">Sushi</option>
-              <option value="vegetariano">Vegetariano</option>
-              <option value="gourmet">Gourmet</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="description">Descripción</label>
-            <textarea
-              id="description"
-              placeholder="Describe el restaurante..."
-            ></textarea>
-          </div>
-
-          <div class="form-group">
-            <label for="rating">Calificación *</label>
-            <input
-              type="number"
-              id="rating"
-              min="0"
-              max="5"
-              step="0.1"
-              required
-            />
-          </div>
-
-          <div class="form-group">
-            <label for="price">Rango de Precio *</label>
-            <select id="price" required>
-              <option value="">Seleccionar</option>
-              <option value="Económico">Económico</option>
-              <option value="Moderado">Moderado</option>
-              <option value="Caro">Caro</option>
-              <option value="Muy Caro">Muy Caro</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="location">Ubicación</label>
-            <input
-              type="text"
-              id="location"
-              placeholder="Dirección del restaurante"
-            />
-          </div>
-
-          <div class="form-group">
-            <label for="delivery">Tiempo de Entrega (min)</label>
-            <input type="number" id="delivery" placeholder="30" />
-          </div>
-
-          <div class="form-actions">
-            <button type="button" class="btn-cancel" onclick="closeModal()">
-              Cancelar
-            </button>
-            <button type="submit" class="btn-save">Guardar</button>
-          </div>
-        </form>
-      </div>
     </div>
 
-        <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const authData = sessionStorage.getItem("authData");
-    if (!authData) {
-      window.location.href = "./login.html";
-      return;
-    }
-
-    const { usuario } = JSON.parse(authData);
-    if (usuario.rol !== "admin") {
-      alert("Acceso denegado");
-      window.location.href = "./usuario.html";
-    }
-  });
-</script>
-  </body>
+    <script src="./admin.js"></script>
+</body>
 </html>

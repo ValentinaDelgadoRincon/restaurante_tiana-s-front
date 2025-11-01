@@ -1,4 +1,4 @@
-const API = "http://localhost:4000/api/v1/restaurantes";
+const API_URL = "http://localhost:4000/restaurantes";
 
 let restaurants = [
   {
@@ -40,7 +40,7 @@ async function loadTable() {
   tbody.innerHTML = "";
 
   try {
-    const res = await fetch(API);
+    const res = await fetch(API_URL);
     if (!res.ok) throw new Error("No hay respuesta del backend");
     const backendData = await res.json();
     if (backendData.length) restaurants = backendData;
@@ -121,7 +121,7 @@ document
 
     try {
       if (currentId) {
-        await fetch(`${API}/${currentId}`, {
+        await fetch(`${API_URL}/${currentId}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(formData),
@@ -136,12 +136,9 @@ document
         formData._id = newId;
 
         try {
-          const res = await fetch(API, {
+          const res = await fetch(API_URL, {
             method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify(formData),
           });
           const created = await res.json();
@@ -166,7 +163,7 @@ async function editRestaurant(id) {
   let restaurant = restaurants.find((r) => r._id === id);
   if (!restaurant) {
     try {
-      const res = await fetch(`${API}/${id}`);
+      const res = await fetch(`${API_URL}/${id}`);
       restaurant = await res.json();
     } catch {
       showNotification("No se encontró restaurante", "error");
@@ -180,7 +177,7 @@ async function deleteRestaurant(id) {
   if (!confirm("¿Seguro de eliminar este restaurante?")) return;
 
   try {
-    await fetch(`${API}/${id}`, { method: "DELETE" });
+    await fetch(`${API_URL}/${id}`, { method: "DELETE" });
   } catch {
     console.warn("No se pudo eliminar en backend, se elimina localmente.");
   }
@@ -194,7 +191,7 @@ async function viewRestaurant(id) {
   let r = restaurants.find((r) => r._id === id);
   if (!r) {
     try {
-      const res = await fetch(`${API}/${id}`);
+      const res = await fetch(`${API_URL}/${id}`);
       r = await res.json();
     } catch {
       showNotification(" Error al cargar detalles", "error");

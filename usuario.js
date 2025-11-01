@@ -9,7 +9,7 @@ const searchBtn = document.getElementById("searchBtn");
 const searchInput = document.getElementById("searchInput");
 const resultados = document.getElementById("resultadosRestaurantes");
 const msg = document.getElementById("searchMessage");
-const reseñasContenedor = document.querySelector(".reviews-section");
+const reseniasContenedor = document.querySelector(".reviews-section");
 const btnReview = document.querySelector(".btn-review");
 
 let token = localStorage.getItem("token");
@@ -87,11 +87,11 @@ async function buscarRestaurantes() {
 }
 
 
-async function cargarReseñas() {
-  reseñasContenedor.innerHTML = "<p>Cargando reseñas...</p>";
+async function cargarResenias() {
+  reseniasContenedor.innerHTML = "<p>Cargando reseñas...</p>";
   try {
-    const data = await api.reseñas.listar();
-    reseñasContenedor.innerHTML = "";
+    const data = await api.resenias.listar();
+    reseniasContenedor.innerHTML = "";
     data.forEach((r) => {
       const div = document.createElement("div");
       div.classList.add("review-card");
@@ -116,10 +116,10 @@ async function cargarReseñas() {
         r.likes || 0
       }</button>
         </div>`;
-      reseñasContenedor.appendChild(div);
+      reseniasContenedor.appendChild(div);
     });
   } catch {
-    reseñasContenedor.innerHTML = "<p>No se pudieron cargar reseñas 😢</p>";
+    reseniasContenedor.innerHTML = "<p>No se pudieron cargar reseñas 😢</p>";
   }
 }
 
@@ -128,8 +128,8 @@ document.addEventListener("click", async (e) => {
   if (e.target.classList.contains("btn-like")) {
     const id = e.target.dataset.id;
     try {
-      await api.reseñas.like(id, token);
-      cargarReseñas();
+      await api.resenias.like(id, token);
+      cargarResenias();
     } catch {
       alert("Debes iniciar sesión para dar like 👍");
     }
@@ -139,28 +139,41 @@ document.addEventListener("click", async (e) => {
 
 
 document.addEventListener("DOMContentLoaded", () => {
-  cargarReseñas();
+  cargarResenias();
 });
 
 
+// === RESEÑAS ===
 const modalReview = document.getElementById("modalReview");
 const closeReview = document.getElementById("closeReview");
 const formReview = document.getElementById("formReview");
 const ratingStars = document.getElementById("ratingStars").querySelectorAll("i");
 let selectedRating = 0;
 
+// Botón para abrir el modal de reseña
 btnReview.addEventListener("click", () => {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    alert("⚠️ Debes iniciar sesión para escribir una reseña");
+    return;
+  }
+
+  // Abre el modal
   modalReview.style.display = "flex";
 });
 
+// Cerrar modal con la X
 closeReview.addEventListener("click", () => {
   modalReview.style.display = "none";
 });
 
+// Cerrar modal haciendo clic afuera
 window.addEventListener("click", (e) => {
   if (e.target === modalReview) modalReview.style.display = "none";
 });
 
+// Selección de estrellas
 ratingStars.forEach((star) => {
   star.addEventListener("click", () => {
     selectedRating = parseInt(star.dataset.value);
@@ -170,24 +183,43 @@ ratingStars.forEach((star) => {
   });
 });
 
+// Envío del formulario de reseña
 formReview.addEventListener("submit", async (e) => {
   e.preventDefault();
   const comentario = document.getElementById("reviewComentario").value.trim();
   const calificacion = selectedRating;
+  const token = localStorage.getItem("token");
+
+  // 🟩 IMPORTANTE: asigna el ID real de un restaurante de tu base de datos
+  const restaurante = "672f6c97e5f44b7a5f3e1a64";
+
+  if (!token) {
+    alert("⚠️ Debes iniciar sesión para enviar reseñas");
+    return;
+  }
+
   if (!comentario || calificacion === 0) {
-    alert("Por favor completa todos los campos ⭐");
+    alert("⚠️ Completa todos los campos antes de enviar");
     return;
   }
 
   try {
-    await api.reseñas.crear({ comentario, calificacion }, token);
+    const res = await api.reseñas.crear(
+      { comentario, calificacion, restaurante },
+      token
+    );
+    console.log("✅ Reseña creada:", res);
     alert("Reseña enviada correctamente");
     modalReview.style.display = "none";
     formReview.reset();
     selectedRating = 0;
     ratingStars.forEach((s) => s.classList.remove("active"));
     cargarReseñas();
-  } catch {
-    alert("Debes iniciar sesión para escribir reseñas");
+  } catch (err) {
+    console.error("❌ Error detallado al enviar reseña:", err);
+    alert(
+      "No se pudo enviar la reseña. Verifica tu sesión o intenta más tarde."
+    );
   }
 });
+
