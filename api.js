@@ -59,7 +59,7 @@ export const api = {
   },
 
 
-  reseñas: {
+  resenias: {
     async listar() {
       const token = localStorage.getItem("token");
       const headers = token ? { Authorization: `Bearer ${token}` } : {};
