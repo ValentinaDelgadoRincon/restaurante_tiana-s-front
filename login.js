@@ -32,10 +32,10 @@
         console.log(data);
 
         if (res.ok) {
-          // ✅ Guarda toda la data (ya incluye token, rol, etc.)
+          
           sessionStorage.setItem("authData", JSON.stringify(data));
 
-          // ✅ El backend devuelve rol directamente, no dentro de "usuario"
+          
           const rol = data.rol;
 
           if (rol === "admin") {
@@ -43,7 +43,7 @@
           } else if (rol === "usuario") {
             window.location.href = "./usuario.html";
           } else {
-            window.location.href = "./index.html"; // fallback
+            window.location.href = "./index.html"; 
           }
         } else {
           errorLoginMsg.textContent =
@@ -142,7 +142,7 @@
             msg.style.display = "none";
           }, 2000);
         } else {
-          // 👇 Evitamos error si message no tiene errors[]
+          
           msg.textContent =
             data.message?.errors?.[0]?.msg || data.message || "No se pudo registrar el usuario.";
           msg.style.color = "red";

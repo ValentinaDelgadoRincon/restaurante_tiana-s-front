@@ -24,11 +24,11 @@
         <div class="search-bar">
             <input id="searchInput" type="text" placeholder="Buscar restaurantes, platos, cocinas...">
             <button id="searchBtn"><i class="fas fa-search"></i> Buscar</button>
-          </div>
-          <p id="searchMessage" class="search-message"></p>
-          
-          <section id="resultadosRestaurantes" class="restaurants-grid"></section>
-          
+        </div>
+        <p id="searchMessage" class="search-message"></p>
+
+        <section id="resultadosRestaurantes" class="restaurants-grid"></section>
+
     </section>
 
     <section class="filters">
@@ -636,53 +636,53 @@
         </div>
     </div>
 
-<button id="btnAdmin" class="btn-admin">Soy admin</button>
+    <button id="btnAdmin" class="btn-admin">Soy admin</button>
 
-<div id="modalAdminLogin" class="modal-admin" style="display:none;">
-  <div class="modal-card">
-    <span class="close-x" title="Cerrar">&times;</span>
-    <h2>Ingreso Administrador</h2>
-    <form id="formAdminLogin">
-      <label for="adminUser">Usuario</label>
-      <input id="adminUser" type="text" required placeholder="Usuario">
+    <div id="modalAdminLogin" class="modal-admin" style="display:none;">
+        <div class="modal-card">
+            <span class="close-x" title="Cerrar">&times;</span>
+            <h2>Ingreso Administrador</h2>
+            <form id="formAdminLogin">
+                <label for="adminUser">Usuario</label>
+                <input id="adminUser" type="text" required placeholder="Usuario">
 
-      <label for="adminPass">Contraseña</label>
-      <input id="adminPass" type="password" required placeholder="Contraseña">
+                <label for="adminPass">Contraseña</label>
+                <input id="adminPass" type="password" required placeholder="Contraseña">
 
-      <p id="errorAdminMsg" class="error-msg" style="display:none;"></p>
+                <p id="errorAdminMsg" class="error-msg" style="display:none;"></p>
 
-      <button type="submit">Ingresar</button>
-    </form>
-  </div>
-</div>
-<!-- Modal para nueva reseña -->
-<div id="modalReview" class="modal-admin" style="display:none;">
-  <div class="modal-card">
-    <span class="close-x" id="closeReview" title="Cerrar">&times;</span>
-    <h2>Escribir Reseña</h2>
-    <form id="formReview">
-      <label for="reviewComentario">Comentario</label>
-      <textarea id="reviewComentario" rows="4" placeholder="Escribe tu experiencia..." required></textarea>
+                <button type="submit">Ingresar</button>
+            </form>
+        </div>
+    </div>
 
-      <label>Calificación</label>
-      <div class="rating-stars" id="ratingStars">
-        <i class="fas fa-star" data-value="1"></i>
-        <i class="fas fa-star" data-value="2"></i>
-        <i class="fas fa-star" data-value="3"></i>
-        <i class="fas fa-star" data-value="4"></i>
-        <i class="fas fa-star" data-value="5"></i>
-      </div>
+    <div id="modalReview" class="modal-admin" style="display:none;">
+        <div class="modal-card">
+            <span class="close-x" id="closeReview" title="Cerrar">&times;</span>
+            <h2>Escribir Reseña</h2>
+            <form id="formReview">
+                <label for="reviewComentario">Comentario</label>
+                <textarea id="reviewComentario" rows="4" placeholder="Escribe tu experiencia..." required></textarea>
 
-      <button type="submit">Enviar Reseña</button>
-    </form>
-  </div>
-</div>
+                <label>Calificación</label>
+                <div class="rating-stars" id="ratingStars">
+                    <i class="fas fa-star" data-value="1"></i>
+                    <i class="fas fa-star" data-value="2"></i>
+                    <i class="fas fa-star" data-value="3"></i>
+                    <i class="fas fa-star" data-value="4"></i>
+                    <i class="fas fa-star" data-value="5"></i>
+                </div>
+
+                <button type="submit">Enviar Reseña</button>
+            </form>
+        </div>
+    </div>
 
 
     <script type="module" src="./usuario.js"></script>
     <script type="module" src="./api.js"></script>
 
-        
+
 </body>
 
 </html>

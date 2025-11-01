@@ -119,7 +119,7 @@ async function cargarResenias() {
       reseniasContenedor.appendChild(div);
     });
   } catch {
-    reseniasContenedor.innerHTML = "<p>No se pudieron cargar reseñas 😢</p>";
+    reseniasContenedor.innerHTML = "<p>No se pudieron cargar reseñas</p>";
   }
 }
 
@@ -143,19 +143,19 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
-// === RESEÑAS ===
+
 const modalReview = document.getElementById("modalReview");
 const closeReview = document.getElementById("closeReview");
 const formReview = document.getElementById("formReview");
 const ratingStars = document.getElementById("ratingStars").querySelectorAll("i");
 let selectedRating = 0;
 
-// Botón para abrir el modal de reseña
+
 btnReview.addEventListener("click", () => {
   const token = localStorage.getItem("token");
 
   if (!token) {
-    alert("⚠️ Debes iniciar sesión para escribir una reseña");
+    alert("Debes iniciar sesión para escribir una reseña");
     return;
   }
 
@@ -183,23 +183,23 @@ ratingStars.forEach((star) => {
   });
 });
 
-// Envío del formulario de reseña
+
 formReview.addEventListener("submit", async (e) => {
   e.preventDefault();
   const comentario = document.getElementById("reviewComentario").value.trim();
   const calificacion = selectedRating;
   const token = localStorage.getItem("token");
 
-  // 🟩 IMPORTANTE: asigna el ID real de un restaurante de tu base de datos
+  
   const restaurante = "672f6c97e5f44b7a5f3e1a64";
 
   if (!token) {
-    alert("⚠️ Debes iniciar sesión para enviar reseñas");
+    alert("Debes iniciar sesión para enviar reseñas");
     return;
   }
 
   if (!comentario || calificacion === 0) {
-    alert("⚠️ Completa todos los campos antes de enviar");
+    alert("Completa todos los campos antes de enviar");
     return;
   }
 
@@ -208,7 +208,7 @@ formReview.addEventListener("submit", async (e) => {
       { comentario, calificacion, restaurante },
       token
     );
-    console.log("✅ Reseña creada:", res);
+    console.log("Reseña creada:", res);
     alert("Reseña enviada correctamente");
     modalReview.style.display = "none";
     formReview.reset();
@@ -216,7 +216,7 @@ formReview.addEventListener("submit", async (e) => {
     ratingStars.forEach((s) => s.classList.remove("active"));
     cargarReseñas();
   } catch (err) {
-    console.error("❌ Error detallado al enviar reseña:", err);
+    console.error("Error detallado al enviar reseña:", err);
     alert(
       "No se pudo enviar la reseña. Verifica tu sesión o intenta más tarde."
     );

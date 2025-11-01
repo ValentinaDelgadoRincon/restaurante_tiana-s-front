@@ -1,7 +1,7 @@
 const BASE_URL = "http://localhost:4000/api/v1";
 
 export const api = {
-  // --- USUARIOS ---
+
   usuarios: {
     async login({ correo, contrasenia }) {
       const res = await fetch(`${BASE_URL}/usuarios/login`, {
@@ -14,7 +14,7 @@ export const api = {
     },
   },
 
-  // --- RESTAURANTES ---
+
   restaurantes: {
     async buscar(query) {
       const token = localStorage.getItem("token");
@@ -23,24 +23,24 @@ export const api = {
       try {
         const res = await fetch(`${BASE_URL}/restaurantes`, { headers });
 
-        
+
         if (!res.ok) {
-          console.warn("⚠️ Backend no disponible, usando datos locales");
+          console.warn("Backend no disponible, usando datos locales");
           return filtrarLocales(query);
         }
 
         const data = await res.json();
 
-        
+
         if (!Array.isArray(data) || data.length === 0) {
-          console.warn("⚠️ Sin datos desde backend, usando locales");
+          console.warn("Sin datos desde backend, usando locales");
           return filtrarLocales(query);
         }
 
-       
+
         if (!query) return data;
 
-        
+
         const q = query.toLowerCase();
         const filtrados = data.filter(
           (r) =>
@@ -49,21 +49,21 @@ export const api = {
             r.descripcion?.toLowerCase().includes(q)
         );
 
-        
+
         return filtrados.length > 0 ? filtrados : filtrarLocales(query);
       } catch (error) {
-        console.error("❌ Error en búsqueda:", error);
+        console.error("Error en búsqueda:", error);
         return filtrarLocales(query);
       }
     },
   },
 
-  // --- RESEÑAS---
+
   reseñas: {
     async listar() {
       const token = localStorage.getItem("token");
       const headers = token ? { Authorization: `Bearer ${token}` } : {};
-      const res = await fetch(`${BASE_URL}/resenias`,{headers});
+      const res = await fetch(`${BASE_URL}/resenias`, { headers });
       if (!res.ok) throw new Error("Error al obtener reseñas");
       console.log(res);
       return res.json();

@@ -199,12 +199,9 @@ async function viewRestaurant(id) {
     }
   }
   alert(
-    `Detalles del Restaurante:\n\nNombre: ${r.name}\nCategoría: ${
-      r.category
-    }\nCalificación: ${r.rating} \nPrecio: ${r.price}\nUbicación: ${
-      r.location
-    }\nEntrega: ${r.delivery} min\nDescripción: ${
-      r.description || "Sin descripción"
+    `Detalles del Restaurante:\n\nNombre: ${r.name}\nCategoría: ${r.category
+    }\nCalificación: ${r.rating} \nPrecio: ${r.price}\nUbicación: ${r.location
+    }\nEntrega: ${r.delivery} min\nDescripción: ${r.description || "Sin descripción"
     }`
   );
 }
@@ -221,8 +218,8 @@ function filterTable() {
       parseFloat(r.cells[2]?.textContent.match(/[\d.]+/)?.[0]) || 0;
     r.style.display =
       name.includes(search) &&
-      (!cat || category === cat) &&
-      (!rate || rating >= rate)
+        (!cat || category === cat) &&
+        (!rate || rating >= rate)
         ? ""
         : "none";
   });
@@ -230,9 +227,8 @@ function filterTable() {
 
 function showNotification(msg, type = "success") {
   const n = document.createElement("div");
-  n.style.cssText = `position:fixed;top:100px;right:20px;background:${
-    type === "success" ? "#4caf50" : "#f44336"
-  };color:white;padding:1rem 1.5rem;border-radius:10px;box-shadow:0 4px 15px rgba(0,0,0,0.3);z-index:10000;font-weight:600;animation:slideIn 0.3s ease;`;
+  n.style.cssText = `position:fixed;top:100px;right:20px;background:${type === "success" ? "#4caf50" : "#f44336"
+    };color:white;padding:1rem 1.5rem;border-radius:10px;box-shadow:0 4px 15px rgba(0,0,0,0.3);z-index:10000;font-weight:600;animation:slideIn 0.3s ease;`;
   n.textContent = msg;
   document.body.appendChild(n);
   setTimeout(() => {
