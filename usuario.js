@@ -1,8 +1,7 @@
 import { api } from "./api.js";
 
-console.log("✅ Script usuario.js cargado correctamente");
+console.log(" Script usuario.js cargado correctamente");
 
-// ====== ELEMENTOS ======
 const btnAdmin = document.getElementById("btnAdmin");
 const modal = document.getElementById("modalAdminLogin");
 const closeX = modal?.querySelector(".close-x");
@@ -21,11 +20,9 @@ const sortSelect = document.querySelector(".sort-select");
 let token = localStorage.getItem("token");
 console.log("🔑 Token inicial cargado del localStorage:", token);
 
-// ====== DATOS LOCALES (para pruebas sin backend) ======
 let restaurantesLocales = [];
 let reseniasLocales = [];
 
-// 🆕 Restaurantes estáticos del HTML (para que funcionen los filtros y búsqueda)
 const restaurantesEstaticos = [
   { _id: "static-1", nombre: "La Bella Italia", descripcion: "Auténtica cocina italiana con recetas tradicionales y los mejores ingredientes importados.", categoria: "Italiana", promedioCalificacion: 4.8, totalLikes: 234, ranking: 8, popularidad: 234, platos: ["Spaghetti Carbonara", "Pizza Margherita", "Lasagna Bolognesa", "Risotto ai Funghi", "Tiramisu Casero"] },
   { _id: "static-2", nombre: "Sakura Sushi", descripcion: "Sushi fresco preparado por maestros sushimen con más de 20 años de experiencia.", categoria: "Japonesa", promedioCalificacion: 4.9, totalLikes: 189, ranking: 9, popularidad: 189, platos: ["Sushi variado", "Sashimi", "Ramen"] },
@@ -35,9 +32,7 @@ const restaurantesEstaticos = [
   { _id: "static-6", nombre: "Sweet Dreams", descripcion: "Pasteles artesanales, cupcakes y postres únicos para endulzar tu día.", categoria: "Postres", promedioCalificacion: 4.9, totalLikes: 145, ranking: 9, popularidad: 145, platos: ["Cupcakes", "Pasteles", "Brownies", "Cheesecake"] }
 ];
 
-// ============================
-// LOGIN ADMINISTRADOR
-// ============================
+
 if (btnAdmin) {
   btnAdmin.addEventListener("click", () => (modal.style.display = "flex"));
 }
@@ -61,13 +56,12 @@ if (formAdmin) {
       const data = await api.usuarios.login({ correo, contrasenia });
       if (!data.token) throw new Error("Token no recibido del servidor");
       localStorage.setItem("token", data.token);
-      console.log("✅ Token guardado en localStorage:", data.token);
+      console.log(" Token guardado en localStorage:", data.token);
       alert("Bienvenido, administrador");
       modal.style.display = "none";
       setTimeout(() => window.location.reload(), 500);
     } catch (err) {
-      console.warn("❌ Error en login, usando datos locales", err);
-      // LOGIN LOCAL DE PRUEBA
+      console.warn(" Error en login, usando datos locales", err);
       if (correo === "admin@test.com" && contrasenia === "1234") {
         localStorage.setItem("token", "token-local-demo");
         alert("Bienvenido, administrador (modo local)");
@@ -81,18 +75,14 @@ if (formAdmin) {
   });
 }
 
-// ============================
-// CARGAR RESTAURANTES
-// ============================
+
 async function cargarRestaurantesInicial() {
   try {
     const data = await api.restaurantes.listar();
-    // 🆕 Combinar backend + estáticos
     restaurantesLocales = [...data, ...restaurantesEstaticos];
     mostrarRestaurantes(restaurantesLocales);
   } catch (err) {
-    console.warn("❌ Error backend restaurantes, usando datos locales", err);
-    // Datos locales de prueba + estáticos
+    console.warn("Error backend restaurantes, usando datos locales", err);
     restaurantesLocales = [
       { _id: "1", nombre: "La Pizzería", descripcion: "Pizza al horno de leña", categoria: "Italiano", promedioCalificacion: 4.5, totalLikes: 10, ranking: 5, popularidad: 100, platos: [] },
       { _id: "2", nombre: "Sushi House", descripcion: "Sushi fresco", categoria: "Japonesa", promedioCalificacion: 4.8, totalLikes: 15, ranking: 4, popularidad: 120, platos: [] },
@@ -102,9 +92,6 @@ async function cargarRestaurantesInicial() {
   }
 }
 
-// ============================
-// MOSTRAR RESTAURANTES
-// ============================
 function mostrarRestaurantes(data) {
   if (!data || data.length === 0) {
     msg.textContent = "No se encontraron resultados 😢";
@@ -130,14 +117,10 @@ function mostrarRestaurantes(data) {
   agregarEventosVerDetalles();
 }
 
-// ============================
-// EVENTO VER DETALLES
-// ============================
+
 function agregarEventosVerDetalles() {
-  // 🆕 Ahora busca tanto en cards dinámicas como estáticas
   const botonesDetalles = document.querySelectorAll(".restaurant-card .btn-view, .restaurant-item .btn-view");
   botonesDetalles.forEach((btn) => {
-    // 🔧 Remover listeners previos clonando el botón
     const nuevoBtn = btn.cloneNode(true);
     btn.parentNode.replaceChild(nuevoBtn, btn);
     
@@ -147,14 +130,12 @@ function agregarEventosVerDetalles() {
       
       const id = nuevoBtn.dataset.id;
       
-      // 🆕 Si no tiene ID, buscar por nombre (para botones del HTML estático)
       let restaurante;
       if (!id) {
         const card = nuevoBtn.closest(".restaurant-card, .restaurant-item");
         const nombre = card.querySelector(".card-title, .item-title, h3")?.textContent.trim();
         restaurante = restaurantesLocales.find(r => r.nombre === nombre) || restaurantesEstaticos.find(r => r.nombre === nombre);
       } else {
-        // Buscar primero en locales
         restaurante = restaurantesLocales.find((r) => r._id === id);
       }
       
@@ -165,17 +146,16 @@ function agregarEventosVerDetalles() {
       
       try {
         const res = await api.restaurantes.detalle(id);
-        console.log("📌 Detalle restaurante:", res);
+        console.log(" Detalle restaurante:", res);
         mostrarDetalleRestaurante(res);
       } catch (err) {
-        console.warn("❌ Error backend, mostrando detalle local", err);
+        console.warn(" Error backend, mostrando detalle local", err);
         alert("No se encontró el restaurante");
       }
     });
   });
 }
 
-// 🆕 Nueva función para mostrar detalles en alerta
 function mostrarDetalleRestaurante(restaurante) {
   const platosTexto = restaurante.platos && restaurante.platos.length > 0 
     ? restaurante.platos.join(", ") 
@@ -184,9 +164,7 @@ function mostrarDetalleRestaurante(restaurante) {
   alert(`🍽️ ${restaurante.nombre}\n\n📝 ${restaurante.descripcion}\n\n🏷️ Categoría: ${restaurante.categoria}\n\n⭐ Calificación: ${restaurante.promedioCalificacion?.toFixed(1) ?? "N/A"}\n\n👍 Likes: ${restaurante.totalLikes ?? 0}\n\n🍴 Platos destacados:\n${platosTexto}`);
 }
 
-// ============================
-// BUSCAR RESTAURANTES
-// ============================
+
 if (searchBtn && searchInput) {
   searchBtn.addEventListener("click", buscarRestaurantes);
   searchInput.addEventListener("keypress", (e) => {
@@ -199,10 +177,8 @@ async function buscarRestaurantes() {
   msg.textContent = "Buscando...";
   resultados.innerHTML = "";
 
-  // Intento backend
   try {
     const data = await api.restaurantes.buscar(query);
-    // 🆕 Buscar también en estáticos
     const estaticosEncontrados = restaurantesEstaticos.filter(
       (r) =>
         r.nombre.toLowerCase().includes(query) ||
@@ -217,7 +193,7 @@ async function buscarRestaurantes() {
     }
     mostrarRestaurantes(todosResultados);
   } catch (err) {
-    console.warn("❌ Error backend, buscando localmente", err);
+    console.warn(" Error backend, buscando localmente", err);
     const resultadosLocales = restaurantesLocales.filter(
       (r) =>
         r.nombre.toLowerCase().includes(query) ||
@@ -232,9 +208,7 @@ async function buscarRestaurantes() {
   }
 }
 
-// ============================
-// FILTROS
-// ============================
+
 filterBtns.forEach((btn) => {
   btn.addEventListener("click", async () => {
     filterBtns.forEach((b) => b.classList.remove("active"));
@@ -246,11 +220,9 @@ filterBtns.forEach((btn) => {
       let data;
       if (categoria === "Todos") {
         data = await api.restaurantes.listar();
-        // 🆕 Agregar estáticos
         data = [...data, ...restaurantesEstaticos];
       } else {
         data = await api.restaurantes.filtrarPorCategoria(categoria);
-        // 🆕 Filtrar estáticos también
         const estaticosCategoria = restaurantesEstaticos.filter(
           r => r.categoria.toLowerCase() === categoria.toLowerCase()
         );
@@ -259,7 +231,7 @@ filterBtns.forEach((btn) => {
       restaurantesLocales = data;
       mostrarRestaurantes(data);
     } catch (err) {
-      console.warn("❌ Error backend filtros, usando locales", err);
+      console.warn(" Error backend filtros, usando locales", err);
       const dataFiltrada =
         categoria === "Todos"
           ? restaurantesLocales
@@ -271,9 +243,6 @@ filterBtns.forEach((btn) => {
   });
 });
 
-// ============================
-// ORDENAR RESTAURANTES
-// ============================
 if (sortSelect) {
   sortSelect.addEventListener("change", async () => {
     const option = sortSelect.value;
@@ -281,7 +250,7 @@ if (sortSelect) {
       let data;
       if (option === "Ranking") {
         data = await api.restaurantes.ordenarPor("ranking");
-        // 🆕 Ordenar estáticos también
+ 
         const estaticosOrdenados = [...restaurantesEstaticos].sort((a, b) => (b.ranking ?? 0) - (a.ranking ?? 0));
         data = [...data, ...estaticosOrdenados];
       } else if (option === "Popularidad") {
@@ -295,7 +264,7 @@ if (sortSelect) {
       restaurantesLocales = data;
       mostrarRestaurantes(data);
     } catch (err) {
-      console.warn("❌ Error backend ordenar, usando locales", err);
+      console.warn(" Error backend ordenar, usando locales", err);
       let dataOrdenada = [...restaurantesLocales];
       if (option === "Ranking") dataOrdenada.sort((a, b) => (b.ranking ?? 0) - (a.ranking ?? 0));
       if (option === "Popularidad") dataOrdenada.sort((a, b) => (b.popularidad ?? 0) - (a.popularidad ?? 0));
@@ -304,9 +273,6 @@ if (sortSelect) {
   });
 }
 
-// ============================
-// CARGAR RESEÑAS
-// ============================
 async function cargarResenias() {
   reseniasContenedor.innerHTML = "<p>Cargando reseñas...</p>";
   const tokenActual = localStorage.getItem("token");
@@ -316,7 +282,7 @@ async function cargarResenias() {
     const data = await api.resenias.listar();
     reseniasLocales = data;
   } catch (err) {
-    console.warn("❌ Error backend reseñas, usando locales", err);
+    console.warn(" Error backend reseñas, usando locales", err);
     reseniasLocales = [
       { _id: "r1", usuario: "Juan", comentario: "Excelente!", calificacion: 5, fecha: new Date(), likes: 3 },
       { _id: "r2", usuario: "Ana", comentario: "Muy bueno", calificacion: 4, fecha: new Date(), likes: 1 },
@@ -351,9 +317,7 @@ document.addEventListener("DOMContentLoaded", () => {
   cargarResenias();
 });
 
-// ============================
-// BOTÓN LIKE
-// ============================
+
 document.addEventListener("click", async (e) => {
   if (e.target.classList.contains("btn-like")) {
     const id = e.target.dataset.id;
@@ -366,11 +330,11 @@ document.addEventListener("click", async (e) => {
 
     try {
       const res = await api.resenias.like(id, token);
-      console.log("✅ Like registrado:", res);
+      console.log(" Like registrado:", res);
       cargarResenias();
     } catch (err) {
-      console.warn("❌ Error backend like, usando locales", err);
-      // Like local de prueba
+      console.warn(" Error backend like, usando locales", err);
+
       const rLocal = reseniasLocales.find((r) => r._id === id);
       if (rLocal) rLocal.likes = (rLocal.likes || 0) + 1;
       cargarResenias();
@@ -378,9 +342,6 @@ document.addEventListener("click", async (e) => {
   }
 });
 
-// ============================
-// CREAR RESEÑA NUEVA
-// ============================
 const modalReview = document.getElementById("modalReview");
 const closeReview = document.getElementById("closeReview");
 const formReview = document.getElementById("formReview");
@@ -417,7 +378,7 @@ if (formReview) {
     const comentario = document.getElementById("reviewComentario").value.trim();
     const calificacion = selectedRating;
     const token = localStorage.getItem("token");
-    const restauranteId = "1"; // ejemplo local
+    const restauranteId = "1"; 
 
     if (!token) return alert("Debes iniciar sesión para enviar reseñas");
     if (!comentario || calificacion === 0) return alert("Completa todos los campos antes de enviar");
@@ -449,9 +410,6 @@ if (formReview) {
   });
 }
 
-// ============================
-// LOGOUT
-// ============================
 if (logoutBtn) {
   logoutBtn.addEventListener("click", () => {
     localStorage.removeItem("token");
