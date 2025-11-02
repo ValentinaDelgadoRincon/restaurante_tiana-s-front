@@ -23,27 +23,22 @@
           body: JSON.stringify({ correo, contrasenia }),
         });
 
-        let data;
-        try {
-          data = await res.json();
-        } catch {
-          throw new Error("Respuesta del servidor no válida.");
-        }
-        console.log(data);
+        const data = await res.json();
+        console.log("🟢 Respuesta del backend:", data);
 
         if (res.ok) {
-          
-          sessionStorage.setItem("authData", JSON.stringify(data));
+          // ✅ Guardar token y rol en localStorage
+          localStorage.setItem("token", data.token);
+          localStorage.setItem("rol", data.rol);
+          console.log("✅ Token guardado en localStorage:", data.token);
 
-          
-          const rol = data.rol;
-
-          if (rol === "admin") {
+          // Redirección según rol
+          if (data.rol === "admin") {
             window.location.href = "./admin.html";
-          } else if (rol === "usuario") {
+          } else if (data.rol === "usuario") {
             window.location.href = "./usuario.html";
           } else {
-            window.location.href = "./index.html"; 
+            window.location.href = "./index.html";
           }
         } else {
           errorLoginMsg.textContent =
@@ -51,7 +46,7 @@
           errorLoginMsg.style.display = "block";
         }
       } catch (err) {
-        console.error(err);
+        console.error("❌ Error en login:", err);
         errorLoginMsg.textContent =
           "No se pudo conectar con el servidor. Intenta más tarde.";
         errorLoginMsg.style.display = "block";
@@ -59,6 +54,9 @@
     });
   }
 
+  // =========================
+  // REGISTRO DE USUARIO
+  // =========================
   const registerForm = document.querySelector(".sign-up-form");
 
   if (registerForm) {
@@ -122,12 +120,7 @@
           }
         );
 
-        let data;
-        try {
-          data = await res.json();
-        } catch {
-          throw new Error("Respuesta del servidor no válida.");
-        }
+        const data = await res.json();
 
         if (res.ok) {
           msg.textContent = "Registro exitoso. Ahora puedes iniciar sesión.";
@@ -142,9 +135,10 @@
             msg.style.display = "none";
           }, 2000);
         } else {
-          
           msg.textContent =
-            data.message?.errors?.[0]?.msg || data.message || "No se pudo registrar el usuario.";
+            data.message?.errors?.[0]?.msg ||
+            data.message ||
+            "No se pudo registrar el usuario.";
           msg.style.color = "red";
           msg.style.display = "block";
         }
@@ -158,6 +152,9 @@
     });
   }
 
+  // =========================
+  // ANIMACIONES DE LOGIN/REGISTRO
+  // =========================
   const sign_in_btn = document.querySelector("#sign-in-btn");
   const sign_up_btn = document.querySelector("#sign-up-btn");
   const container = document.querySelector(".container");
