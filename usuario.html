@@ -25,19 +25,27 @@
             <input id="searchInput" type="text" placeholder="Buscar restaurantes, platos, cocinas...">
             <button id="searchBtn"><i class="fas fa-search"></i> Buscar</button>
         </div>
-        <p id="searchMessage" class="search-message"></p>
-
-        <section id="resultadosRestaurantes" class="restaurants-grid"></section>
-
-    </section>
-
-    <section class="filters">
+        <section class="filters">
         <button class="filter-btn active">Todos</button>
         <button class="filter-btn">Comida rápida</button>
         <button class="filter-btn">Gourmet</button>
         <button class="filter-btn">Vegetariano</button>
         <button class="filter-btn">Sushi</button>
     </section>
+    <div class="content-header">
+                <h1>Todos los Restaurantes</h1>
+                <select class="sort-select">
+                    <option>Ordenar por</option>
+                    <option>Popularidad</option>
+                    <option>Ranking</option>
+                </select>
+            </div>
+        <p id="searchMessage" class="search-message"></p>
+
+        <section id="resultadosRestaurantes" class="restaurants-grid"></section>
+
+    </section>
+
 
     <div class="container">
         <h2 class="section-title">Restaurantes Destacados</h2>
@@ -191,14 +199,7 @@
     <div class="main-container">
 
         <section class="content" id="todosRestaurantes">
-            <div class="content-header">
-                <h1>Todos los Restaurantes</h1>
-                <select class="sort-select">
-                    <option>Ordenar por</option>
-                    <option>Popularidad</option>
-                    <option>Ranking</option>
-                </select>
-            </div>
+            
 
             <div class="restaurants-list">
                 <div class="restaurant-item">
