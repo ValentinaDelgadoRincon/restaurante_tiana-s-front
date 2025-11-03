@@ -159,7 +159,7 @@ npm install express  jsonwebtoken bcrypt cors dotenv
 
 ## 🎬 Video Explicativo
 Video de máximo 7 minutos explicando el proyecto:  
-🎥 [Ver video en Drive]()
+🎥 [Ver video en Drive](https://drive.google.com/file/d/1Rmu_tho-KyNiDfFRrHHJGNHvqfJzI5A_/view?usp=drivesdk)
 
 ---
 
